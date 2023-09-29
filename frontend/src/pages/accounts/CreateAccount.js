@@ -24,7 +24,7 @@ const CreateAccount = () => {
       setWait('')
       if (data.success) setTitle(data.accounts)
     } catch (error) {
-      setError('اکاؤنٹ نہیں مل رہا')
+      setError('s')
       setWait('')
     }
   }
@@ -122,7 +122,7 @@ const CreateAccount = () => {
         }
       }
     } catch (error) {
-      setError('Some oter problem occured')
+      setError(error)
       setWait('')
     }
   }
@@ -136,7 +136,7 @@ const CreateAccount = () => {
       setWait('')
       if (data.success) setGuarranter(data.accounts)
     } catch (error) {
-      setError('اکاؤنٹ نہیں مل رہا')
+      setError('')
       setWait('')
     }
   }
