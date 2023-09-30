@@ -5,7 +5,7 @@ import PropTypes from 'prop-types' // Import PropTypes
 export const AllStates = (props) => {
   //Host
   // const host = 'http://localhost:5000'
-  const host = 'https://brainy-garb-mite.cyclic.cloud'
+  const host = 'https://helpful-wetsuit-dove.cyclic.cloud'
   //   const host = ""
   //States
   const [accounts, setAccounts] = useState([])
