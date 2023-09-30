@@ -109,18 +109,18 @@ const Dashboard = () => {
     return formattedAmount
   }
 
-  // Fetch Cash Debit Credit detail when the component mounts
-  useEffect(() => {
-    const fetchCashDCs = async () => {
-      try {
-        const response = await getCashDCs('')
-      } catch (error) {
-        //
-      }
-    }
+  // // Fetch Cash Debit Credit detail when the component mounts
+  // useEffect(() => {
+  //   const fetchCashDCs = async () => {
+  //     try {
+  //       const response = await getCashDCs('')
+  //     } catch (error) {
+  //       //
+  //     }
+  //   }
 
-    fetchCashDCs()
-  }, [getCashDCs])
+  //   fetchCashDCs()
+  // }, [getCashDCs])
 
   // Fetch Timeline detail when the component mounts
   useEffect(() => {
