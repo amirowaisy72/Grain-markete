@@ -14,7 +14,6 @@ export const AllStates = (props) => {
   const [cashEntries, setCashEntries] = useState([])
   const [stock, setStock] = useState([])
   const [stockEntries, setStockEntries] = useState([])
-  const [timeline, setTimeLine] = useState([])
 
   //Accounts API
   //Create Account
@@ -472,16 +471,23 @@ export const AllStates = (props) => {
   }
 
   //Dashboar API's Start
+  //States about Dashboard
+  const [dashboardAccounts, setDashboardAccounts] = useState({})
+  const [timeline, setTimeLine] = useState([])
   //Get others crops names
   const accountsBlock = async (crop) => {
-    const response = await fetch(`${host}/accounts/accountsBlock`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    const json = await response.json()
-    return json
+    try {
+      const response = await fetch(`${host}/accounts/accountsBlock`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      const json = await response.json()
+      setDashboardAccounts(json)
+    } catch (error) {
+      //
+    }
   }
 
   //Timeline
@@ -506,6 +512,7 @@ export const AllStates = (props) => {
           cashEntries,
           stock,
           stockEntries,
+          dashboardAccounts,
           timeline,
           createAccount,
           searchAccount,

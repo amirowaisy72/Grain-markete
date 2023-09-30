@@ -16,8 +16,7 @@ import { FaCircle } from 'react-icons/fa'
 
 const WidgetsDropdown = () => {
   const context = useContext(contextCreator)
-  const { accountsBlock, getStocks, stock, getCashPoints, cashPoints } = context
-  const [accounts, setAccounts] = useState({})
+  const { accountsBlock, dashboardAccounts, getStocks, stock, getCashPoints, cashPoints } = context
   // Define showBalance state variable and setShowBalance state updater function
   const [showBalance, setShowBalance] = useState(null)
 
@@ -26,7 +25,6 @@ const WidgetsDropdown = () => {
     const fetchAccounts = async () => {
       try {
         const response = await accountsBlock()
-        setAccounts(response)
       } catch (error) {
         //
       }
@@ -90,16 +88,16 @@ const WidgetsDropdown = () => {
             value={
               <>
                 اکاؤنٹس
-                <span className="fs-6 fw-normal"> ({accounts.totalAccounts})</span>
+                <span className="fs-6 fw-normal"> ({dashboardAccounts.totalAccounts})</span>
                 <br />
                 <FaCircle style={{ color: 'green', fontSize: '80%' }} />
-                <span className="fs-6 fw-normal"> ({accounts.regularAccounts})</span>
+                <span className="fs-6 fw-normal"> ({dashboardAccounts.regularAccounts})</span>
                 <br />
                 <FaCircle style={{ color: 'yellow', fontSize: '80%' }} />
-                <span className="fs-6 fw-normal"> ({accounts.highRiskAccounts})</span>
+                <span className="fs-6 fw-normal"> ({dashboardAccounts.highRiskAccounts})</span>
                 <br />
                 <FaCircle style={{ color: 'red', fontSize: '80%' }} />
-                <span className="fs-6 fw-normal"> ({accounts.blackListedAccounts})</span>
+                <span className="fs-6 fw-normal"> ({dashboardAccounts.blackListedAccounts})</span>
               </>
             }
             title=""
