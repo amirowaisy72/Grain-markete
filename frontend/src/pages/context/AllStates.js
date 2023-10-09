@@ -4,8 +4,8 @@ import PropTypes from 'prop-types' // Import PropTypes
 
 export const AllStates = (props) => {
   //Host
-  // const host = 'http://localhost:5000'
-  const host = 'https://helpful-wetsuit-dove.cyclic.cloud'
+  const host = 'http://localhost:5000'
+  // const host = 'https://helpful-wetsuit-dove.cyclic.cloud'
   //   const host = ""
   //States
   const [accounts, setAccounts] = useState([])
@@ -502,6 +502,19 @@ export const AllStates = (props) => {
     setTimeLine(json)
   }
 
+  //Update
+  const [expenses, setExpenses] = useState({})
+  const getExpenseFormulas = async () => {
+    const response = await fetch(`${host}/expenseFormulas/read`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    const json = await response.json()
+    setExpenses(json)
+  }
+
   return (
     <>
       <context.Provider
@@ -514,6 +527,7 @@ export const AllStates = (props) => {
           stockEntries,
           dashboardAccounts,
           timeline,
+          expenses,
           createAccount,
           searchAccount,
           createDc,
@@ -544,6 +558,8 @@ export const AllStates = (props) => {
           deleteStock,
           accountsBlock,
           getTimeline,
+          getExpenseFormulas,
+          setExpenses,
         }}
       >
         {props.children}

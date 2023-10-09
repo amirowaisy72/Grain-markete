@@ -103,6 +103,11 @@ const _nav = [
       },
     ],
   },
+  {
+    component: CNavItem,
+    name: 'خرچہ شیڈول',
+    to: '/expense_schedule',
+  },
   // {
   //   component: CNavGroup,
   //   name: 'بیس',

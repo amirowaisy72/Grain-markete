@@ -31,7 +31,7 @@ const WidgetsDropdown = () => {
     }
 
     fetchAccounts()
-  }, [accountsBlock])
+  }, [])
 
   // Fetch Stock detail when the component mounts
   useEffect(() => {
@@ -44,7 +44,7 @@ const WidgetsDropdown = () => {
     }
 
     fetchStock()
-  }, [getStocks])
+  }, [])
 
   // Fetch Cash Points detail when the component mounts
   useEffect(() => {
@@ -57,7 +57,7 @@ const WidgetsDropdown = () => {
     }
 
     fetchCashPoints()
-  }, [getStocks])
+  }, [])
 
   const moneyFormatter = (amount) => {
     if (typeof amount !== 'number' || isNaN(amount)) {

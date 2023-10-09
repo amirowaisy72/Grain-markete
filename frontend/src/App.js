@@ -26,6 +26,8 @@ import Stocks from './pages/stock/Stock Book/Stocks'
 import Entries from './pages/stock/Stock Book/Entries'
 import DeleteStockEntry from './pages/stock/Stock Book/DeleteStockEntry'
 import Print from './pages/Invoice/Print'
+import ExpenseFormulas from './pages/expense_schedule/ExpenseFormulas'
+import EditExpenses from './pages/expense_schedule/EditExpenses'
 
 const loading = (
   <div className="pt-3 text-center">
@@ -128,6 +130,18 @@ class App extends Component {
                 element={<DeleteStockEntry />}
               />
               <Route exact path="/printInvoice" name="Print Invoice" element={<Print />} />
+              <Route
+                exact
+                path="/expense_schedule"
+                name="Expense Schedule Formula"
+                element={<ExpenseFormulas />}
+              />
+              <Route
+                exact
+                path="/expense_edit"
+                name="Expense Formulas Edit"
+                element={<EditExpenses />}
+              />
             </Routes>
           </Suspense>
         </HashRouter>
