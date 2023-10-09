@@ -6,7 +6,7 @@ import { FaBook, FaPencilAlt, FaTrash } from 'react-icons/fa'
 
 const ExpenseFormulas = () => {
   const context = useContext(contextCreator)
-  const { getExpenseFormulas, expenses, setExpenses } = context
+  const { getExpenseFormulas, expenses, setExpenses, updateExpenseFormulas } = context
   const [wait, setWait] = useState(null)
   const [editingFormula, setEditingFormula] = useState(null) // Track which formula is being edited
   const [editingKey, setEditingKey] = useState(null) // Track which formula's specific key element is being edited. This is for objects type formulas
@@ -26,6 +26,17 @@ const ExpenseFormulas = () => {
       setWait('Some other problem occurred')
     }
   }, [])
+
+  const update = async () => {
+    try {
+      setWait('اپ ڈیٹ کیا جا رہا ہے')
+      const response = await updateExpenseFormulas({ expenses })
+      setUpdateEnable(true)
+      setWait('')
+    } catch (error) {
+      setWait(error)
+    }
+  }
 
   const handleEditFormula = (formulaKey, key) => {
     // Set the editingFormula state to the key of the formula being edited
@@ -197,7 +208,7 @@ const ExpenseFormulas = () => {
       <h2>
         Expense Data
         <center>
-          <button hidden={updateEnable} className="btn btn-success">
+          <button hidden={updateEnable} onClick={update} className="btn btn-success">
             Update
           </button>
         </center>

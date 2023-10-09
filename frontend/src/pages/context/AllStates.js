@@ -515,6 +515,19 @@ export const AllStates = (props) => {
     setExpenses(json)
   }
 
+  //Update API
+  const updateExpenseFormulas = async ({ expenses }) => {
+    //API Call
+    const response = await fetch(`${host}/expenseFormulas/update`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(expenses),
+    })
+    const json = await response.json()
+  }
+
   return (
     <>
       <context.Provider
@@ -560,6 +573,7 @@ export const AllStates = (props) => {
           getTimeline,
           getExpenseFormulas,
           setExpenses,
+          updateExpenseFormulas,
         }}
       >
         {props.children}
