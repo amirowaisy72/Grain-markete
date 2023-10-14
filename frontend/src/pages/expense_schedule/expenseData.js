@@ -97,6 +97,13 @@ const data = {
         },
         Info: '',
       },
+      Others: {
+        Formula: {
+          CompleteBagMember: 4,
+          CompleteBagNonMember: 5,
+        },
+        Info: '',
+      },
     },
   },
   Brokery: {
@@ -190,3 +197,5 @@ const data = {
   _id: '6521f847696a500cf5cd3b64',
   __v: 0,
 }
+
+export default data

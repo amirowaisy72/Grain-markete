@@ -410,13 +410,10 @@ export const AllStates = (props) => {
     crop,
     quantity,
     rate,
-    mazduriBoriItems,
-    allItems,
     totalAmount,
-    expenseList,
-    expenseAmounts,
-    totalExpenses,
+    calculatedExpenses,
     totalPayableAmount,
+    weightStatement,
   ) => {
     const response = await fetch(`${host}/invoice/createOnlySeller`, {
       method: 'POST',
@@ -428,13 +425,10 @@ export const AllStates = (props) => {
         crop,
         quantity,
         rate,
-        mazduriBoriItems,
-        allItems,
         totalAmount,
-        expenseList,
-        expenseAmounts,
-        totalExpenses,
+        calculatedExpenses,
         totalPayableAmount,
+        weightStatement,
       }),
     })
     const json = await response.json()
@@ -505,14 +499,18 @@ export const AllStates = (props) => {
   //Update
   const [expenses, setExpenses] = useState({})
   const getExpenseFormulas = async () => {
-    const response = await fetch(`${host}/expenseFormulas/read`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    const json = await response.json()
-    setExpenses(json)
+    try {
+      const response = await fetch(`${host}/expenseFormulas/read`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      const json = await response.json()
+      setExpenses(json)
+    } catch (error) {
+      //
+    }
   }
 
   //Update API

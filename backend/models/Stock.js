@@ -32,26 +32,17 @@ const StockSchema = new Schema({
   rate: {
     type: Number,
   },
-  mazduriBoriItems: {
-    type: String,
-  },
-  allItems: {
-    type: String,
-  },
   totalAmount: {
     type: Number,
   },
-  expenseList: {
-    type: [String],
-  },
-  expenseAmounts: {
-    type: Object,
-  },
-  totalExpenses: {
-    type: Number,
+  calculatedExpenses: {
+    type: mongoose.Schema.Types.Mixed,
   },
   totalPayableAmount: {
     type: Number,
+  },
+  weightStatement: {
+    type: String,
   },
   date: {
     type: Date,

@@ -100,7 +100,7 @@ const expenseSchema = new mongoose.Schema({
         },
         Info: String,
       },
-      Other: {
+      Others: {
         Formula: {
           CompleteBagMember: Number,
           CompleteBagNonMember: Number,
@@ -110,6 +110,35 @@ const expenseSchema = new mongoose.Schema({
     },
   },
   Brokery: {
+    Seller: {
+      Gandum: {
+        Formula: Number,
+        Info: String,
+      },
+      Kapaas: {
+        Formula: Number,
+        Info: String,
+      },
+      Sarson: {
+        Formula: Number,
+        Info: String,
+      },
+      Mirch: {
+        Formula: Number,
+        Info: String,
+      },
+      Moonji: {
+        Formula: Number,
+        Info: String,
+      },
+      Others: {
+        Formula: Number,
+        Info: String,
+      },
+    },
+    Buyer: Boolean, // If Buyer is an object, define its schema here
+  },
+  Accountant: {
     Seller: {
       Gandum: {
         Formula: Number,

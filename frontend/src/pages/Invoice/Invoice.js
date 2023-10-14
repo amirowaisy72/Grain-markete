@@ -4,177 +4,119 @@ import { Link, useLocation } from 'react-router-dom'
 import Print from './Print'
 import { useContext } from 'react'
 import contextCreator from '../context/contextCreator'
+import WeightManager from './WeightManager'
+import calculateExpenses from './expenseCalculator'
+import data from '../expense_schedule/expenseData'
 
 function Invoice() {
-  const [createDone, setCreateDone] = useState(true)
-  const context = useContext(contextCreator)
-  const { createOnlySeller, searchAccount } = context
-  const [suggestName, setSuggestName] = useState('')
-  const [postEntryUpdate, setPostEntryUpdate] = useState('')
   const location = useLocation()
-  const [mazduriBoriItems, setMazduriBoriItems] = useState('')
-  const [mazduriTorItems, setMazduriTorItems] = useState('')
-  const [numberOfItems, setNumberOfItems] = useState('')
+  const context = useContext(contextCreator)
+  const { createOnlySeller, searchAccount, getExpenseFormulas, expenses, getOthers } = context
+
+  const [createDone, setCreateDone] = useState(true)
+  const [suggestName, setSuggestName] = useState('')
+  const [wait, setWait] = useState('')
+  const [postEntryUpdate, setPostEntryUpdate] = useState('')
   const [quantityError, setQuantityError] = useState('')
   const [rateError, setRateError] = useState('')
-  const [landlordName, setLandlordName] = useState('')
-  const validCrops = ['Gandum', 'Kapaas', 'Sarson', 'Mirch', 'Moonji']
 
+  //WeightManager section starts
+  const [weightDone, setWeightDone] = useState(false)
+  const [completeBags, setCompleteBags] = useState(null)
+  const [incompleteBags, setIncompleteBags] = useState(null)
+  const [weightStatement, setWeightStatement] = useState('')
+  const [calculatedExpenses, setCalculatedExpenses] = useState({})
+
+  const validCrops = ['Gandum', 'Kapaas', 'Sarson', 'Mirch', 'Moonji']
   const initialCrop = location.state?.crop
   const defaultCrop = validCrops.includes(initialCrop) ? initialCrop : 'Deegar'
 
+  const [landlordName, setLandlordName] = useState('')
   const [crop, setCrop] = useState(location.state ? defaultCrop : 'Select Crop')
+  const [outlistedCrops, setOutlistedCrops] = useState([])
+  const [customCropName, setCustomCropName] = useState(defaultCrop === 'Deegar' ? initialCrop : '')
+  const [quantity, setQuantity] = useState(location.state?.quantity ? location.state.quantity : '')
+  const [rate, setRate] = useState('')
 
   // Custom expense input fields state
   const [customExpenseName, setCustomExpenseName] = useState('')
   const [customExpenseFormula, setCustomExpenseFormula] = useState('')
-  const [customExpenseAmount, setCustomExpenseAmount] = useState(0)
-
-  const [quantity, setQuantity] = useState(location.state?.quantity ? location.state.quantity : '')
-  const [rate, setRate] = useState('')
-  const [expenseList, setExpenseList] = useState([])
-  const [customCropName, setCustomCropName] = useState(defaultCrop === 'Deegar' ? initialCrop : '')
-  const [expenseFormulas, setExpenseFormulas] = useState({
-    // Calculate the default Comission formula based on the initial crop value
-    Comission: (() => {
-      switch (crop) {
-        case 'Gandum':
-        case 'Kapaas':
-          return '0.01'
-        case 'Sarson':
-          return '0.025'
-        case 'Mirch':
-          return '0.05'
-        case 'Moonji':
-        case 'Deegar':
-          return '0.03'
-        default:
-          return '0.01' // Default formula for other crops
-      }
-    })(),
-    Mazduri: '0',
-    Brokery: '0.001',
-    Accountant: '0.007',
-    'Mazduri Bori': '20',
-    'Mazduri Tor': '12',
-  })
-  const [expenseAmounts, setExpenseAmounts] = useState({})
-  const [totalAmount, setTotalAmount] = useState(0)
   //State variables END
-  // Function to add a custom expense to the expense list
+
+  // Fetch other crops when the component mounts
+  useEffect(() => {
+    const fetchOtherCrops = async () => {
+      try {
+        const response = await getOthers()
+        if (response.success) {
+          setOutlistedCrops(response.otherCrops)
+        } else {
+          console.error('Failed to fetch other crops.')
+        }
+      } catch (error) {
+        console.error('An error occurred while fetching other crops:', error)
+      }
+    }
+
+    fetchOtherCrops()
+  }, [])
+
+  //List of Crops
+  const cropOptions = ['Select Crop', 'Gandum', 'Kapaas', 'Sarson', 'Mirch', 'Moonji', 'Deegar']
+
+  // Function to calculate the sum of all expenseCalculated values
+  const calculateTotalExpenses = (expensesList) => {
+    let total = 0
+    for (const expense in expensesList) {
+      total += calculatedExpenses[expense].expenseCalculated
+    }
+    return total
+  }
+
+  //Total Variables
+  const totalAmount = (quantity / 40) * rate
+  const totalPayableAmount = totalAmount - calculateTotalExpenses(calculatedExpenses)
+
+  useEffect(() => {
+    try {
+      async function fetchExpenseFormulas() {
+        // setWait('فارمولا لوڈ ہو رہے ہیں')
+        const response = await getExpenseFormulas()
+        // Assuming response is a valid object
+        // ...
+        // setWait('')
+      }
+      fetchExpenseFormulas()
+    } catch (error) {
+      setWait(error)
+    }
+  }, [])
+
+  //Add custom expense
   const addCustomExpense = () => {
     if (customExpenseName.trim() === '' || customExpenseFormula.trim() === '') {
       return // Don't add if name or formula is empty
     }
 
     // Create a new custom expense object
-    const customExpense = customExpenseName
-    setExpenseList([...expenseList, customExpense])
+    const newCustomExpense = {
+      formula: null, // Convert the formula to a number
+      expenseCalculated: customExpenseFormula,
+    }
 
-    // Update the expense formula with the custom expense
-    setExpenseFormulas((prevFormulas) => ({
-      ...prevFormulas,
-      [customExpense]: customExpenseFormula,
-    }))
+    // Update the calculatedExpenses object with the custom expense
+    const updatedCalculatedExpenses = {
+      ...calculatedExpenses,
+      [customExpenseName]: newCustomExpense,
+    }
+
+    // Set the state with the updated calculatedExpenses object
+    setCalculatedExpenses(updatedCalculatedExpenses)
 
     // Clear the custom expense input fields
     setCustomExpenseName('')
     setCustomExpenseFormula('')
   }
-
-  // Function to calculate the custom expense amount when formula or quantity changes
-  useEffect(() => {
-    try {
-      const amount = eval(customExpenseFormula) // Calculate amount based on the formula
-      setCustomExpenseAmount(amount)
-    } catch (error) {
-      setCustomExpenseAmount(0) // Handle formula errors by setting amount to 0
-    }
-  }, [customExpenseFormula])
-
-  //Other stuff
-  let allItems = ''
-  if (mazduriBoriItems) {
-    allItems = `(${mazduriBoriItems} مکمل بوری )`
-    if (mazduriTorItems) {
-      allItems = allItems + ' (' + mazduriTorItems + ' ادھوری بوری)'
-    }
-  } else {
-    allItems = `${numberOfItems} items`
-  }
-  //Other stuff END
-
-  // Function to calculate the "Mazduri" formula based on the selected crop
-  const calculateMazduriFormula = (selectedCrop) => {
-    switch (selectedCrop) {
-      case 'Kapaas':
-        return '17'
-      case 'Mirch':
-        return '2'
-      case 'Moonji':
-        return '15'
-      default:
-        return '17' // Default formula for other crops
-    }
-  }
-
-  useEffect(() => {
-    // Calculate the total amount in rupees based on Quantity (in kgs) and Rate.
-    const totalAmountInRupees = (quantity / 40) * rate
-    setTotalAmount(totalAmountInRupees)
-
-    // Calculate the amount for each expense based on the formula and update the state.
-    const calculatedAmounts = {}
-    for (const expense of expenseList) {
-      try {
-        let formula = expenseFormulas[expense]
-        let amount = 0
-
-        // Check if the expense is Mazduri, Mazduri Bori, or Mazduri Tor.
-        if (expense === 'Mazduri' || expense === 'Mazduri Bori' || expense === 'Mazduri Tor') {
-          if (expense === 'Mazduri Bori') {
-            amount = eval(formula) * mazduriBoriItems
-          } else if (expense === 'Mazduri Tor') {
-            amount = eval(formula) * mazduriTorItems
-          } else if (crop === 'Kapaas' && expense === 'Mazduri') {
-            amount = eval(formula) * (quantity / 40)
-          } else {
-            amount = eval(formula) * numberOfItems
-          }
-        } else if (
-          expense !== 'Comission' &&
-          expense !== 'Mazduri' &&
-          expense !== 'Mazduri Bori' &&
-          expense !== 'Mazduri Tor' &&
-          expense !== 'Brokery' &&
-          expense !== 'Brokery' &&
-          expense !== 'Accountant'
-        ) {
-          amount = eval(formula)
-        } else {
-          // For other expenses, calculate by multiplying with totalAmountInRupees.
-          amount = eval(formula) * totalAmountInRupees
-        }
-
-        calculatedAmounts[expense] = amount
-      } catch (error) {
-        calculatedAmounts[expense] = 0
-      }
-    }
-    setExpenseAmounts(calculatedAmounts)
-  }, [
-    crop,
-    expenseFormulas,
-    expenseList,
-    quantity,
-    rate,
-    numberOfItems,
-    mazduriBoriItems,
-    mazduriTorItems,
-  ])
-
-  const cropOptions = ['Select Crop', 'Gandum', 'Kapaas', 'Sarson', 'Mirch', 'Moonji', 'Deegar']
-  const expenseOptions = ['Apply Expenses', 'Comission', 'Mazduri', 'Brokery', 'Accountant']
 
   const handleLanslordName = async (e) => {
     let name = capitalizeFirstLetter(e.target.value)
@@ -225,21 +167,29 @@ function Invoice() {
     }
   }
 
-  const handleRemoveExpense = (expense) => {
-    const updatedExpenses = expenseList.filter((item) => item !== expense)
-    setExpenseList(updatedExpenses)
-    // If "Mazduri" is removed, reset the number of items.
-    if (expense === 'Mazduri' || expense === 'Mazduri Bori' || expense === 'Mazduri Tor') {
-      setNumberOfItems(0)
+  const handleCustomCropName = (e) => {
+    setCustomCropName(e.target.value)
+  }
+
+  const handleRemoveExpense = (expenseName) => {
+    // Create a copy of the calculatedExpenses object to avoid mutating the original state
+    const updatedCalculatedExpenses = { ...calculatedExpenses }
+
+    // Check if the expense with the given name exists in the object
+    if (updatedCalculatedExpenses.hasOwnProperty(expenseName)) {
+      // Remove the expense by deleting the property from the object
+      delete updatedCalculatedExpenses[expenseName]
+
+      // You may want to update your state here if necessary
+      // Update the state to reflect the change
+      setCalculatedExpenses(updatedCalculatedExpenses)
+
+      // You can also call any other cleanup or update logic you need to perform
+    } else {
+      // Handle the case where the expense doesn't exist
+      console.warn(`Expense "${expenseName}" not found in the calculatedExpenses object.`)
     }
   }
-
-  const handleFormulaChange = (expense, formula) => {
-    setExpenseFormulas({ ...expenseFormulas, [expense]: formula })
-  }
-
-  const totalExpenses = Object.values(expenseAmounts).reduce((total, amount) => total + amount, 0)
-  const totalPayableAmount = totalAmount - totalExpenses
 
   // Function to capitalize the first letter of every word
   const capitalizeFirstLetter = (str) => {
@@ -254,52 +204,20 @@ function Invoice() {
     return landlordName.trim() !== '' && crop !== 'Select Crop' && quantity !== '' && rate !== ''
   }
 
-  useEffect(() => {
-    // Update the Comission formula based on the selected crop
-    let comissionFormula
-    switch (crop) {
-      case 'Gandum':
-      case 'Kapaas':
-        comissionFormula = '0.01'
-        break
-      case 'Sarson':
-        comissionFormula = '0.025'
-        break
-      case 'Mirch':
-        comissionFormula = '0.05'
-        break
-      case 'Moonji':
-      case 'Deegar':
-        comissionFormula = '0.03'
-        break
-      default:
-        comissionFormula = '0.01' // Default formula for other crops
-    }
-    const updatedMazduriFormula = calculateMazduriFormula(crop)
-    setExpenseFormulas((prevFormulas) => ({
-      ...prevFormulas,
-      Comission: comissionFormula,
-      Mazduri: updatedMazduriFormula,
-    }))
-  }, [crop])
-
   //Apply all expenses automatically
   const applyExpensesAuto = () => {
-    expenseOptions.forEach((expense) => {
-      if (expense !== 'Apply Expenses') {
-        let newExpense = expense
-        if (expense === 'Mazduri') {
-          if (crop === 'Gandum' || crop === 'Sarson' || crop === 'Deegar') {
-            setExpenseList((prevExpenseList) => [...prevExpenseList, 'Mazduri Bori'])
-            setExpenseList((prevExpenseList) => [...prevExpenseList, 'Mazduri Tor'])
-          } else if (crop === 'Kapaas' || crop === 'Mirch' || crop === 'Moonji') {
-            setExpenseList((prevExpenseList) => [...prevExpenseList, 'Mazduri'])
-          }
-        } else {
-          setExpenseList((prevExpenseList) => [...prevExpenseList, newExpense])
-        }
-      }
-    })
+    console.log(expenses)
+    const calculations = calculateExpenses(
+      expenses,
+      crop === 'Deegar' ? 'Others' : crop,
+      (quantity / 40) * rate,
+      completeBags,
+      incompleteBags,
+      false,
+      quantity,
+      'Seller',
+    )
+    setCalculatedExpenses(calculations)
   }
 
   const postEntryHandler = async () => {
@@ -311,13 +229,10 @@ function Invoice() {
         crop === 'Deegar' ? customCropName : crop, // Conditionally set crop here
         quantity,
         rate,
-        mazduriBoriItems,
-        allItems,
         totalAmount,
-        expenseList,
-        expenseAmounts,
-        totalExpenses,
+        calculatedExpenses,
         totalPayableAmount,
+        weightStatement,
       )
       setCreateDone(true)
       if (response.success) {
@@ -328,10 +243,6 @@ function Invoice() {
     } catch (error) {
       setPostEntryUpdate(error.message)
     }
-  }
-
-  const handleCustomCropName = (e) => {
-    setCustomCropName(e.target.value)
   }
 
   return (
@@ -380,21 +291,18 @@ function Invoice() {
                 customCropName,
                 quantity,
                 rate,
-                expenseList,
-                expenseFormulas,
+                calculatedExpenses,
                 totalAmount,
-                expenseAmounts,
-                totalExpenses,
                 totalPayableAmount,
-                mazduriBoriItems,
-                mazduriTorItems,
-                numberOfItems,
-                allItems,
+                completeBags,
+                incompleteBags,
+                weightStatement,
               }}
             >
               بیچ دیں
             </Link>
           )}
+          {wait}
         </center>
       </h2>
       <div className="form-group">
@@ -427,6 +335,11 @@ function Invoice() {
                 value={crop}
                 onChange={handleCropChange}
               >
+                {outlistedCrops.map((crop) => (
+                  <option key={crop} value={crop}>
+                    {crop}
+                  </option>
+                ))}
                 {cropOptions.map((option) => (
                   <option key={option} value={option}>
                     {option === 'Select Crop'
@@ -493,7 +406,19 @@ function Invoice() {
           </div>
         </div>
       )}
-      {landlordName && crop !== 'Select Crop' && quantity && rate && (
+      {landlordName && crop !== 'Select Crop' && rate && (
+        <WeightManager
+          setWeightDone={setWeightDone}
+          setCompleteBags={setCompleteBags}
+          setIncompleteBags={setIncompleteBags}
+          completeBags={completeBags}
+          incompleteBags={incompleteBags}
+          setWeightStatement={setWeightStatement}
+          crop={crop}
+          setQuantity={setQuantity}
+        />
+      )}
+      {landlordName && crop !== 'Select Crop' && quantity && rate && weightDone && (
         <div className="form-group">
           <label>اخراجات</label>
           <div className="d-flex">
@@ -529,12 +454,12 @@ function Invoice() {
               </tr>
             </thead>
             <tbody>
-              {expenseList.map((expense, index) => (
+              {Object.keys(calculatedExpenses).map((expense, index) => (
                 <tr key={index}>
                   <td>
                     {expense === 'Apply Expenses'
                       ? 'اخراجات لگائیں'
-                      : expense === 'Comission'
+                      : expense === 'Commission'
                       ? 'کمیشن'
                       : expense === 'Mazduri'
                       ? 'مزدوری'
@@ -553,50 +478,20 @@ function Invoice() {
                       <input
                         type="text"
                         className="form-control mr-2"
-                        value={expenseFormulas[expense]}
-                        onChange={(e) => handleFormulaChange(expense, e.target.value)}
-                        placeholder={`Enter ${
-                          (expense === 'Mazduri' ||
-                            expense === 'Mazduri Bori' ||
-                            expense === 'Mazduri Tor') &&
-                          crop !== 'Select Crop'
-                            ? 'Formula Value'
-                            : 'Integer'
-                        }`}
+                        value={
+                          typeof calculatedExpenses[expense].formula === 'object'
+                            ? JSON.stringify(calculatedExpenses[expense].formula)
+                            : calculatedExpenses[expense].formula
+                        }
+                        disabled
                       />
-                      {(expense === 'Mazduri' ||
-                        expense === 'Mazduri Bori' ||
-                        expense === 'Mazduri Tor') && (
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={
-                            crop === 'Kapaas'
-                              ? quantity / 40
-                              : expense === 'Mazduri Bori'
-                              ? mazduriBoriItems
-                              : expense === 'Mazduri Tor'
-                              ? mazduriTorItems
-                              : numberOfItems
-                          }
-                          onChange={(e) => {
-                            if (expense === 'Mazduri Bori') {
-                              setMazduriBoriItems(e.target.value)
-                            } else if (expense === 'Mazduri Tor') {
-                              setMazduriTorItems(e.target.value)
-                            } else {
-                              setNumberOfItems(e.target.value)
-                            }
-                          }}
-                          placeholder="تعداد بتائیں"
-                        />
-                      )}
                     </div>
                   </td>
                   <td>
-                    {expenseAmounts[expense] !== undefined && (
+                    {calculatedExpenses[expense].expenseCalculated !== undefined && (
                       <>
-                        Rs {Math.round(expenseAmounts[expense]).toLocaleString()}{' '}
+                        Rs{' '}
+                        {Math.round(calculatedExpenses[expense].expenseCalculated).toLocaleString()}{' '}
                         {/* Display expense amounts in rounded-off format */}
                       </>
                     )}
@@ -615,24 +510,26 @@ function Invoice() {
           </table>
         </div>
       )}
-      {landlordName && crop !== 'Select Crop' && quantity && rate && (
-        <>
-          <Print
-            type="seller"
-            customer={landlordName}
-            crop={crop === 'Deegar' ? customCropName : crop}
-            quantity={quantity}
-            rate={rate}
-            mazduriBoriItems={mazduriBoriItems === '' ? 0 : mazduriBoriItems}
-            allItems={allItems}
-            totalAmount={totalAmount}
-            expenseList={expenseList}
-            expenseAmounts={expenseAmounts}
-            totalExpenses={totalExpenses}
-            totalPayableAmount={totalPayableAmount}
-          />
-        </>
-      )}
+      {landlordName &&
+        crop !== 'Select Crop' &&
+        quantity &&
+        rate &&
+        weightDone &&
+        calculateExpenses && (
+          <>
+            <Print
+              type="seller"
+              customer={landlordName}
+              crop={crop === 'Deegar' ? customCropName : crop}
+              quantity={quantity}
+              rate={rate}
+              weightStatement={weightStatement}
+              totalAmount={totalAmount}
+              calculatedExpenses={calculatedExpenses}
+              totalPayableAmount={totalPayableAmount}
+            />
+          </>
+        )}
     </div>
   )
 }

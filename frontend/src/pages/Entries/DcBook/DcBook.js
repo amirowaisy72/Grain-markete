@@ -81,13 +81,10 @@ const DcBook = ({ data, entriesPerPage }) => {
                     crop: item.crop,
                     quantity: item.quantity,
                     rate: item.rate,
-                    mazduriBoriItems: item.mazduriBoriItems,
-                    allItems: item.allItems,
                     totalAmount: item.totalAmount,
-                    expenseList: item.expenseList,
-                    expenseAmounts: item.expenseAmounts,
-                    totalExpenses: item.totalExpenses,
+                    calculatedExpenses: item.calculatedExpenses,
                     totalPayableAmount: item.totalPayableAmount,
+                    weightStatement: item.weightStatement,
                     source: 'Accounts',
                   }}
                 >

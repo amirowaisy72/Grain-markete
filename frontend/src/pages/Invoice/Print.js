@@ -7,12 +7,9 @@ const Print = ({
   crop,
   quantity,
   rate,
-  mazduriBoriItems,
-  allItems,
+  weightStatement,
   totalAmount,
-  expenseList,
-  expenseAmounts,
-  totalExpenses,
+  calculatedExpenses,
   totalPayableAmount,
 }) => {
   const location = useLocation()
@@ -22,12 +19,10 @@ const Print = ({
   crop = crop || (location.state && location.state.crop) || 'Default Crop'
   quantity = quantity || (location.state && location.state.quantity) || 0
   rate = rate || (location.state && location.state.rate) || 0
-  mazduriBoriItems = mazduriBoriItems || (location.state && location.state.mazduriBoriItems) || 0
-  allItems = allItems || (location.state && location.state.allItems) || 'Default All Items'
+  weightStatement = weightStatement || (location.state && location.state.weightStatement) || ''
   totalAmount = totalAmount || (location.state && location.state.totalAmount) || 0
-  expenseList = expenseList || (location.state && location.state.expenseList) || []
-  expenseAmounts = expenseAmounts || (location.state && location.state.expenseAmounts) || {}
-  totalExpenses = totalExpenses || (location.state && location.state.totalExpenses) || 0
+  calculatedExpenses =
+    calculatedExpenses || (location.state && location.state.calculatedExpenses) || {}
   totalPayableAmount =
     totalPayableAmount || (location.state && location.state.totalPayableAmount) || 0
 
@@ -104,6 +99,15 @@ const Print = ({
         `
   }
 
+  // Function to calculate the sum of all expenseCalculated values
+  const calculateTotalExpenses = (expensesObject) => {
+    let total = 0
+    for (const expense in expensesObject) {
+      total += eval(expensesObject[expense].expenseCalculated)
+    }
+    return total
+  }
+
   return (
     <>
       {location.state?.source === 'Accounts' && (
@@ -121,8 +125,12 @@ const Print = ({
       </button>
       <div className="mt-4" id="invoice-content">
         <h3>انوائس کی معلومات:</h3>
-        <p> {customer},</p>
+        <p>
+          {' '}
+          {customer}, {}
+        </p>
         <p> براہ کرم مندرجہ ذیل تفصیلات دیکھیں:</p>
+        {weightStatement}
         <table className="table">
           <tbody>
             <tr>
@@ -149,14 +157,6 @@ const Print = ({
               <td>ریٹ:</td>
               <td>Rs {rate}</td>
             </tr>
-            {mazduriBoriItems ? (
-              <tr>
-                <td>بوریوں کی تعداد:</td>
-                <td>{allItems}</td>
-              </tr>
-            ) : (
-              ''
-            )}
             <tr>
               <td colSpan="6">کل رقم (Rs):</td>
               <td>Rs {Math.round(totalAmount).toLocaleString()}</td>
@@ -171,12 +171,12 @@ const Print = ({
             </tr>
           </thead>
           <tbody>
-            {expenseList.map((expense, index) => (
-              <tr key={index}>
+            {Object.keys(calculatedExpenses).map((expense) => (
+              <tr key={expense}>
                 <td>
                   {expense === 'Apply Expenses'
                     ? 'اخراجات لگائیں'
-                    : expense === 'Comission'
+                    : expense === 'Commission'
                     ? 'کمیشن'
                     : expense === 'Mazduri'
                     ? 'مزدوری'
@@ -197,20 +197,13 @@ const Print = ({
                     : expense}
                 </td>
                 <td>
-                  {expenseAmounts[expense] !== undefined && (
-                    <>
-                      Rs {Math.round(expenseAmounts[expense]).toLocaleString()}{' '}
-                      {/* رقم کو مدور شدہ فارمیٹ میں دکھائیں */}
-                    </>
-                  )}
+                  Rs {Math.round(calculatedExpenses[expense].expenseCalculated).toLocaleString()}
                 </td>
               </tr>
             ))}
             <tr>
               <th>کل خرچہ:</th>
-              <th>
-                Rs {totalExpenses !== undefined && Math.round(totalExpenses).toLocaleString()}
-              </th>
+              <th>Rs {Math.round(calculateTotalExpenses(calculatedExpenses)).toLocaleString()}</th>
             </tr>
             <tr>
               <th>کل رقم:</th>
@@ -236,14 +229,16 @@ Print.propTypes = {
   crop: PropTypes.string.isRequired,
   quantity: PropTypes.number.isRequired,
   rate: PropTypes.number.isRequired,
-  mazduriBoriItems: PropTypes.number.isRequired,
-  allItems: PropTypes.string.isRequired,
+  weightStatement: PropTypes.string.isRequired,
   totalAmount: PropTypes.number.isRequired,
-  expenseList: PropTypes.arrayOf(PropTypes.string).isRequired,
-  expenseAmounts: PropTypes.object.isRequired,
-  totalExpenses: PropTypes.number.isRequired,
+  calculatedExpenses: PropTypes.objectOf(
+    PropTypes.shape({
+      formula: PropTypes.number.isRequired,
+      expenseCalculated: PropTypes.number.isRequired,
+    }),
+  ).isRequired,
   totalPayableAmount: PropTypes.number.isRequired,
-  type: PropTypes.number.isRequired,
+  type: PropTypes.string.isRequired,
 }
 
 export default Print

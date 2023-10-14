@@ -18,13 +18,10 @@ router.post("/createOnlySeller", async (req, res) => {
       crop,
       quantity,
       rate,
-      mazduriBoriItems,
-      allItems,
       totalAmount,
-      expenseList,
-      expenseAmounts,
-      totalExpenses,
+      calculatedExpenses,
       totalPayableAmount,
+      weightStatement,
     } = req.body;
 
     totalPayableAmount = Math.round(totalPayableAmount);
@@ -50,13 +47,10 @@ router.post("/createOnlySeller", async (req, res) => {
             crop: crop,
             quantity: quantity,
             rate: rate,
-            mazduriBoriItems: mazduriBoriItems,
-            allItems: allItems,
             totalAmount: totalAmount,
-            expenseList: expenseList,
-            expenseAmounts: expenseAmounts,
-            totalExpenses: totalExpenses,
+            calculatedExpenses: calculatedExpenses,
             totalPayableAmount: totalPayableAmount,
+            weightStatement: weightStatement,
             date: Date.now(),
           },
         ],
@@ -76,13 +70,10 @@ router.post("/createOnlySeller", async (req, res) => {
               description: "انوائس",
               customer: customer,
               rate: rate,
-              mazduriBoriItems: mazduriBoriItems,
-              allItems: allItems,
               totalAmount: totalAmount,
-              expenseList: expenseList,
-              expenseAmounts: expenseAmounts,
-              totalExpenses: totalExpenses,
+              calculatedExpenses: calculatedExpenses,
               totalPayableAmount: totalPayableAmount,
+              weightStatement: weightStatement,
             },
           ],
           { session }
@@ -93,67 +84,28 @@ router.post("/createOnlySeller", async (req, res) => {
           errorOccured = "Some Problem Occured while creating Stock entry";
           await session.abortTransaction();
         } else {
-          // Create Expense Accounts after successful Stock creation
-          const specifiedExpenses = [
-            "Comission",
+          const recognizedExpenses = [
+            "Commission",
             "Mazduri",
             "Brokery",
             "Accountant",
-            "Markete_Fee",
           ];
 
-          // Preprocess expenseList and expenseAmounts
-          const filteredExpenseList = [];
-          const updatedExpenseAmounts = {};
+          for (const expenseType in calculatedExpenses) {
+            if (recognizedExpenses.includes(expenseType)) {
+              const currentExpense = calculatedExpenses[expenseType];
 
-          for (let i = 0; i < expenseList.length; i++) {
-            const currentExpense = expenseList[i];
-
-            // Check if the currentExpense is one of the variations of Mazduri
-            if (
-              currentExpense === "Mazduri Bori" ||
-              currentExpense === "Mazduri Tor"
-            ) {
-              // If it's one of the variations, add its amount to the corresponding Mazduri entry
-              updatedExpenseAmounts["Mazduri"] =
-                (updatedExpenseAmounts["Mazduri"] || 0) +
-                expenseAmounts[currentExpense];
-            } else {
-              // If it's not one of the variations, keep it as is
-              filteredExpenseList.push(currentExpense);
-              updatedExpenseAmounts[currentExpense] =
-                expenseAmounts[currentExpense];
-            }
-          }
-
-          // Include "Mazduri" if it has an amount
-          if (updatedExpenseAmounts["Mazduri"] !== undefined) {
-            // Include "Mazduri" if it is not already present in filteredExpenseList
-            if (!filteredExpenseList.includes("Mazduri")) {
-              filteredExpenseList.push("Mazduri");
-            }
-          }
-
-          // Update expenseList and expenseAmounts
-          expenseList = filteredExpenseList;
-          expenseAmounts = updatedExpenseAmounts;
-
-          // Now you can run your loop with the updated expenseList and expenseAmounts
-          for (let i = 0; i < expenseList.length; i++) {
-            const currentExpense = expenseList[i];
-
-            if (specifiedExpenses.includes(currentExpense)) {
               // Check if an account with the expense name already exists
               const existingAccount = await Accounts.findOne({
-                name: currentExpense,
+                name: expenseType,
               }).session(session);
 
               if (!existingAccount) {
-                // Create a new account for the expense with the name
+                // Create a new account for the recognized expense with the name
                 await Accounts.create(
                   [
                     {
-                      name: currentExpense, // Add the name of the expense
+                      name: expenseType, // Add the name of the recognized expense
                       status: "Regular",
                     },
                   ],
@@ -161,23 +113,21 @@ router.post("/createOnlySeller", async (req, res) => {
                 );
               }
 
+              // Create Dc entry for the recognized expense
               await Dc.create(
                 [
                   {
-                    name: currentExpense,
+                    name: expenseType,
                     detail: "انوائس",
-                    amount: Math.round(expenseAmounts[currentExpense]),
+                    amount: Math.round(currentExpense.expenseCalculated), // Use your specific logic for amount
                     DbCr: "Credit",
                     crop: crop,
                     quantity: quantity,
                     rate: rate,
-                    mazduriBoriItems: mazduriBoriItems,
-                    allItems: allItems,
                     totalAmount: totalAmount,
-                    expenseList: expenseList,
-                    expenseAmounts: expenseAmounts,
-                    totalExpenses: totalExpenses,
+                    calculatedExpenses: calculatedExpenses,
                     totalPayableAmount: totalPayableAmount,
+                    weightStatement: weightStatement,
                     date: Date.now(),
                   },
                 ],
@@ -230,13 +180,10 @@ router.post("/createBuyerSeller", async (req, res) => {
         crop,
         quantity,
         rate,
-        mazduriBoriItems,
-        allItems,
         totalAmount,
-        expenseList,
-        expenseAmounts,
-        totalExpenses,
+        calculatedExpenses,
         totalPayableAmount,
+        weightStatement,
       } = invoice;
 
       totalPayableAmount = Math.round(totalPayableAmount);
@@ -264,13 +211,10 @@ router.post("/createBuyerSeller", async (req, res) => {
             crop: crop,
             quantity: quantity,
             rate: rate,
-            mazduriBoriItems: mazduriBoriItems,
-            allItems: allItems,
             totalAmount: totalAmount,
-            expenseList: expenseList,
-            expenseAmounts: expenseAmounts,
-            totalExpenses: totalExpenses,
+            calculatedExpenses: calculatedExpenses,
             totalPayableAmount: totalPayableAmount,
+            weightStatement: weightStatement,
             date: Date.now(),
           },
         ],
@@ -296,13 +240,10 @@ router.post("/createBuyerSeller", async (req, res) => {
               description: "انوائس",
               customer: customer,
               rate: rate,
-              mazduriBoriItems: mazduriBoriItems,
-              allItems: allItems,
               totalAmount: totalAmount,
-              expenseList: expenseList,
-              expenseAmounts: expenseAmounts,
-              totalExpenses: totalExpenses,
+              calculatedExpenses: calculatedExpenses,
               totalPayableAmount: totalPayableAmount,
+              weightStatement: weightStatement,
             },
           ],
           { session }
@@ -315,67 +256,23 @@ router.post("/createBuyerSeller", async (req, res) => {
         break; // Exit the loop on the first error
       }
 
-      // Create Expense Accounts after successful Stock creation
-      const specifiedExpenses = [
-        "Comission",
-        "Mazduri",
-        "Brokery",
-        "Accountant",
-        "Markete_Fee",
-      ];
+      const recognizedExpenses = ["Commission", "Mazduri", "Market Fee"];
 
-      // Preprocess expenseList and expenseAmounts
-      const filteredExpenseList = [];
-      const updatedExpenseAmounts = {};
+      for (const expenseType in calculatedExpenses) {
+        if (recognizedExpenses.includes(expenseType)) {
+          const currentExpense = calculatedExpenses[expenseType];
 
-      for (let i = 0; i < expenseList.length; i++) {
-        const currentExpense = expenseList[i];
-
-        // Check if the currentExpense is one of the variations of Mazduri
-        if (
-          currentExpense === "Mazduri Bori" ||
-          currentExpense === "Mazduri Tor"
-        ) {
-          // If it's one of the variations, add its amount to the corresponding Mazduri entry
-          updatedExpenseAmounts["Mazduri"] =
-            (updatedExpenseAmounts["Mazduri"] || 0) +
-            expenseAmounts[currentExpense];
-        } else {
-          // If it's not one of the variations, keep it as is
-          filteredExpenseList.push(currentExpense);
-          updatedExpenseAmounts[currentExpense] =
-            expenseAmounts[currentExpense];
-        }
-      }
-
-      // Include "Mazduri" if it has an amount
-      if (updatedExpenseAmounts["Mazduri"] !== undefined) {
-        // Include "Mazduri" if it is not already present in filteredExpenseList
-        if (!filteredExpenseList.includes("Mazduri")) {
-          filteredExpenseList.push("Mazduri");
-        }
-      }
-
-      // Update expenseList and expenseAmounts
-      expenseList = filteredExpenseList;
-      expenseAmounts = updatedExpenseAmounts;
-
-      // Now you can run your loop with the updated expenseList and expenseAmounts
-      for (let i = 0; i < expenseList.length; i++) {
-        const currentExpense = expenseList[i];
-
-        if (specifiedExpenses.includes(currentExpense)) {
           // Check if an account with the expense name already exists
           const existingAccount = await Accounts.findOne({
-            name: currentExpense,
+            name: expenseType,
           }).session(session);
 
           if (!existingAccount) {
-            // Create a new account for the expense with the name
+            // Create a new account for the recognized expense with the name
             await Accounts.create(
               [
                 {
-                  name: currentExpense, // Add the name of the expense
+                  name: expenseType, // Add the name of the recognized expense
                   status: "Regular",
                 },
               ],
@@ -383,23 +280,21 @@ router.post("/createBuyerSeller", async (req, res) => {
             );
           }
 
+          // Create Dc entry for the recognized expense
           await Dc.create(
             [
               {
-                name: currentExpense,
+                name: expenseType,
                 detail: "انوائس",
-                amount: Math.round(expenseAmounts[currentExpense]),
+                amount: Math.round(currentExpense.expenseCalculated), // Use your specific logic for amount
                 DbCr: "Credit",
                 crop: crop,
                 quantity: quantity,
                 rate: rate,
-                mazduriBoriItems: mazduriBoriItems,
-                allItems: allItems,
                 totalAmount: totalAmount,
-                expenseList: expenseList,
-                expenseAmounts: expenseAmounts,
-                totalExpenses: totalExpenses,
+                calculatedExpenses: calculatedExpenses,
                 totalPayableAmount: totalPayableAmount,
+                weightStatement: weightStatement,
                 date: Date.now(),
               },
             ],

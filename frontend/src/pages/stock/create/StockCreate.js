@@ -40,7 +40,7 @@ const StockCreate = () => {
     }
 
     fetchOtherCrops()
-  }, [getOthers])
+  }, [])
 
   const handleCropChange = async (e) => {
     const selectedValue = e.target.value

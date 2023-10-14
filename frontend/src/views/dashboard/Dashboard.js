@@ -141,13 +141,13 @@ const Dashboard = () => {
   // Filter the timeline array to exclude specified names
   const filteredTimeline = timeline.filter((item) => {
     return !(
-      item.name === 'Comission' ||
+      item.name === 'Commission' ||
       item.name === 'Mazduri' ||
       item.name === 'Brokery' ||
       item.name === 'Accountant' ||
       item.name === 'Sootli' ||
       item.name === 'Ghisai' ||
-      item.name === 'Markete_Fee'
+      item.name === 'Market Fee'
     )
   })
 

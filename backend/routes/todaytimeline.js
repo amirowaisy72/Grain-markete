@@ -108,7 +108,7 @@ router.get("/read", async (req, res) => {
       },
       // Filter out specific names ('Comission', 'Mazduri', 'Brokery', 'Accountant')
       name: {
-        $nin: ["Comission", "Mazduri", "Brokery", "Accountant"],
+        $nin: ["Commission", "Mazduri", "Brokery", "Accountant", "Markete Fee"],
       },
     })
       .sort({ date: 1 })
