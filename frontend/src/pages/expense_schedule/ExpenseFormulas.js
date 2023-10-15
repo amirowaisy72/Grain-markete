@@ -205,6 +205,9 @@ const ExpenseFormulas = () => {
 
   return (
     <div>
+      <Link className="btn btn-primary" to="/dashboard">
+        ڈیش بورڈ
+      </Link>
       <h2>
         Expense Data
         <center>
