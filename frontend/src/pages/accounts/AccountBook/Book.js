@@ -67,6 +67,7 @@ const Book = ({ data, entriesPerPage }) => {
               <th>شناختی کارڈ نمبر</th>
               <th>پتہ</th>
               <th>ضامن</th>
+              <th>اکاؤنٹ کی حالت</th>
               <th>کارروائیاں</th> {/* کارروائیوں کے لئے ایک ایکسٹرا کالم */}
             </tr>
           </thead>
@@ -83,6 +84,7 @@ const Book = ({ data, entriesPerPage }) => {
                 <td>{item.idCardNumber}</td>
                 <td>{item.address}</td>
                 <td>{item.guarranter}</td>
+                <td>{item.accountType}</td>
                 <td>
                   <Link
                     className="btn btn-success mr-2"
@@ -101,6 +103,7 @@ const Book = ({ data, entriesPerPage }) => {
                       guarranter: item.guarranter,
                       idCard: item.idCardNumber,
                       status: item.status,
+                      accountType: item.accountType,
                     }}
                     className="btn btn-warning mr-2"
                   >

@@ -16,7 +16,7 @@ function Buyer() {
     location.state && location.state.source === 'Landlord' ? true : false,
   )
 
-  const [member, setMember] = useState(false)
+  const [member, setMember] = useState(location.state?.member ? location.state.member : false)
 
   const [completeBags, setCompleteBags] = useState(
     location.state?.completeBags ? location.state.completeBags : null,
@@ -32,6 +32,7 @@ function Buyer() {
   const context = useContext(contextCreator)
   const { createBuyerSeller, searchAccount, createStockManual, getExpenseFormulas, expenses } =
     context
+  const [accountFound, setAccountFound] = useState(false)
   const [suggestName, setSuggestName] = useState('')
   const [postEntryUpdate, setPostEntryUpdate] = useState('')
   const [invoicesButtonDisabled, setInvoicesButtonDisabled] = useState('')
@@ -41,7 +42,7 @@ function Buyer() {
   const [customExpenseFormula, setCustomExpenseFormula] = useState('')
 
   //Top Inputs
-  const [buyerName, setBuyerName] = useState('')
+  const [buyerName, setBuyerName] = useState(location.state?.account ? location.state.account : '')
   const validCrops = ['Gandum', 'Kapaas', 'Sarson', 'Mirch', 'Moonji']
   const initialCrop = location.state?.crop
   const defaultCrop = validCrops.includes(initialCrop) ? initialCrop : 'Deegar'
@@ -63,6 +64,35 @@ function Buyer() {
 
   //Handles member or not
   const handleMemberChange = (event) => {
+    if (!accountFound) {
+      setSuggestName(
+        <Link
+          state={{
+            account: buyerName,
+            member: event.target.checked,
+            quantity: quantity,
+            rate: rate,
+            sourceBuyer: 'Buyer',
+            source: location.state.source,
+            crop: location.state.crop,
+            landlordName: location.state.landlordName,
+            customCropName: location.state.customCropName,
+            calculatedExpenses: location.state.calculatedExpenses,
+            totalAmount: location.state.totalAmount,
+            totalPayableAmount: location.state.totalPayableAmount,
+            completeBags: location.state.completeBags,
+            incompleteBags: location.state.incompleteBags,
+            weightStatement: location.state.weightStatement,
+            buyerInvoices: buyerInvoices,
+          }}
+          className="btn btn-primary"
+          to="/accounts/create"
+        >
+          اکاؤنٹ نہیں ملا۔ کیا آپ اس نام کے ساتھ نیا اکاؤنٹ بنانا چاہیں گے؟
+        </Link>,
+      )
+    }
+
     setMember(event.target.checked)
   }
 
@@ -168,6 +198,35 @@ function Buyer() {
 
   const handleQuantityChange = (e) => {
     const enteredQuantity = parseFloat(e.target.value) || 0
+    if (!accountFound) {
+      setSuggestName(
+        <Link
+          state={{
+            account: buyerName,
+            member: member,
+            quantity: enteredQuantity,
+            rate: rate,
+            sourceBuyer: 'Buyer',
+            source: location.state?.source || 'Landlord',
+            crop: location.state.crop,
+            landlordName: location.state.landlordName,
+            customCropName: location.state.customCropName,
+            calculatedExpenses: location.state.calculatedExpenses,
+            totalAmount: location.state.totalAmount,
+            totalPayableAmount: location.state.totalPayableAmount,
+            completeBags: location.state.completeBags,
+            incompleteBags: location.state.incompleteBags,
+            weightStatement: location.state.weightStatement,
+            buyerInvoices: buyerInvoices,
+          }}
+          className="btn btn-primary"
+          to="/accounts/create"
+        >
+          اکاؤنٹ نہیں ملا۔ کیا آپ اس نام کے ساتھ نیا اکاؤنٹ بنانا چاہیں گے؟
+        </Link>,
+      )
+    }
+    //Next Statements
     if (enteredQuantity <= remainingQuantity) {
       setQuantity(enteredQuantity)
     }
@@ -176,6 +235,38 @@ function Buyer() {
   const handleRateChange = (e) => {
     setRate(e.target.value)
     const newRate = e.target.value
+
+    //Check if account not found
+    if (!accountFound) {
+      setSuggestName(
+        <Link
+          state={{
+            account: buyerName,
+            member: member,
+            quantity: quantity,
+            rate: newRate,
+            sourceBuyer: 'Buyer',
+            source: location.state?.source || 'Landlord',
+            crop: location.state.crop,
+            landlordName: location.state.landlordName,
+            customCropName: location.state.customCropName,
+            calculatedExpenses: location.state.calculatedExpenses,
+            totalAmount: location.state.totalAmount,
+            totalPayableAmount: location.state.totalPayableAmount,
+            completeBags: location.state.completeBags,
+            incompleteBags: location.state.incompleteBags,
+            weightStatement: location.state.weightStatement,
+            buyerInvoices: buyerInvoices,
+          }}
+          className="btn btn-primary"
+          to="/accounts/create"
+        >
+          اکاؤنٹ نہیں ملا۔ کیا آپ اس نام کے ساتھ نیا اکاؤنٹ بنانا چاہیں گے؟
+        </Link>,
+      )
+    }
+
+    //Next statements
     setRate(newRate)
     // Step 2: Add validation function
     if (!newRate.match(/^\d+(\.\d{1,2})?$/)) {
@@ -263,6 +354,66 @@ function Buyer() {
     }
   }
 
+  // Fetch recently registered account title if it has come from a state when component mounts
+  useEffect(() => {
+    if (location.state) {
+      if (location.state.account) {
+        const fetchAccount = async () => {
+          let name = location.state.account
+          setBuyerName(name)
+          setPostEntryUpdate('مشابہ اکاؤنٹ چیک کر رہا ہے...')
+          try {
+            let data = await searchAccount(name)
+            setPostEntryUpdate('')
+            if (data.success) {
+              const excludedNames = ['Commission', 'Mazduri', 'Brokery', 'Accountant', 'Market Fee']
+              const displayContent = !excludedNames.includes(data.accounts.name) ? (
+                data.accounts.name
+              ) : (
+                <></>
+              )
+              setSuggestName(displayContent)
+              setAccountFound(true)
+            } else {
+              console.log('Failed 1')
+            }
+          } catch (error) {
+            setPostEntryUpdate('')
+            setSuggestName(
+              <Link
+                state={{
+                  account: name,
+                  member: member,
+                  quantity: quantity,
+                  rate: rate,
+                  sourceBuyer: 'Buyer',
+                  source: location.state?.source || 'Landlord',
+                  crop: location.state.crop,
+                  landlordName: location.state.landlordName,
+                  customCropName: location.state.customCropName,
+                  calculatedExpenses: location.state.calculatedExpenses,
+                  totalAmount: location.state.totalAmount,
+                  totalPayableAmount: location.state.totalPayableAmount,
+                  completeBags: location.state.completeBags,
+                  incompleteBags: location.state.incompleteBags,
+                  weightStatement: location.state.weightStatement,
+                  buyerInvoices: buyerInvoices,
+                }}
+                className="btn btn-primary"
+                to="/accounts/create"
+              >
+                اکاؤنٹ نہیں ملا۔ کیا آپ اس نام کے ساتھ نیا اکاؤنٹ بنانا چاہیں گے؟
+              </Link>,
+            )
+            setAccountFound(false)
+          }
+        }
+
+        fetchAccount()
+      }
+    }
+  }, [])
+
   const handleBuyerName = async (e) => {
     let name = capitalizeFirstLetter(e.target.value)
     setBuyerName(name)
@@ -271,10 +422,46 @@ function Buyer() {
       let data = await searchAccount(e.target.value)
       setPostEntryUpdate('')
       if (data.success) {
-        setSuggestName(data.accounts.name)
+        const excludedNames = ['Commission', 'Mazduri', 'Brokery', 'Accountant', 'Market Fee']
+        const displayContent = !excludedNames.includes(data.accounts.name) ? (
+          data.accounts.name
+        ) : (
+          <></>
+        )
+        setSuggestName(displayContent)
+        setAccountFound(true)
+      } else {
+        console.log('Failed 1')
       }
     } catch (error) {
       setPostEntryUpdate('')
+      setSuggestName(
+        <Link
+          state={{
+            account: e.target.value,
+            member: member,
+            quantity: quantity,
+            rate: rate,
+            sourceBuyer: 'Buyer',
+            source: location.state?.source || 'Landlord',
+            crop: location.state.crop,
+            landlordName: location.state.landlordName,
+            customCropName: location.state.customCropName,
+            calculatedExpenses: location.state.calculatedExpenses,
+            totalAmount: location.state.totalAmount,
+            totalPayableAmount: location.state.totalPayableAmount,
+            completeBags: location.state.completeBags,
+            incompleteBags: location.state.incompleteBags,
+            weightStatement: location.state.weightStatement,
+            buyerInvoices: buyerInvoices,
+          }}
+          className="btn btn-primary"
+          to="/accounts/create"
+        >
+          اکاؤنٹ نہیں ملا۔ کیا آپ اس نام کے ساتھ نیا اکاؤنٹ بنانا چاہیں گے؟
+        </Link>,
+      )
+      setAccountFound(false)
     }
   }
 
@@ -401,7 +588,9 @@ function Buyer() {
           <div className="form-group">
             <button
               onClick={() => {
-                setBuyerName(suggestName)
+                if (typeof suggestName === 'string') {
+                  setBuyerName(suggestName)
+                }
               }}
               className="btn btn-primary"
             >

@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react'
 import contextCreator from '../context/contextCreator'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 // Import icons for the dropdown options
 import { FaCircle } from 'react-icons/fa'
 import Select from 'react-select' // Import the Select component from react-select
@@ -53,16 +53,22 @@ const CreateAccount = () => {
       .join(' ')
   }
 
+  const location = useLocation()
+
+  const account = location.state?.account ? location.state.account : null
+
   const [detail, setDetail] = useState({
-    name: '',
+    name: account ? account : '',
     mobile: '',
     address: '',
     guarranter: '',
     mobileNumbers: [], // Array to store multiple mobile numbers
     idCardNumber: '', // ID card number field
     status: 'Regular',
+    accountType: 'خریدار',
   })
 
+  const [titleRegistered, setTitleRegistered] = useState(detail.name)
   const [title, setTitle] = useState({})
   const [wait, setWait] = useState('')
   const [error, setError] = useState()
@@ -75,10 +81,19 @@ const CreateAccount = () => {
     } else {
       setDetail({ ...detail, [e.target.name]: e.target.value })
     }
+
+    //Update title registered
+    if (e.target.name === 'name') {
+      setTitleRegistered(e.target.value)
+    }
   }
 
   const onChangeStatus = (selectedOption) => {
     setDetail({ ...detail, status: selectedOption.value })
+  }
+
+  const onChangeAccountType = (selectedOption) => {
+    setDetail({ ...detail, accountType: selectedOption.value })
   }
 
   const handleClick = async () => {
@@ -104,11 +119,13 @@ const CreateAccount = () => {
           detail.guarranter,
           detail.idCardNumber,
           detail.status,
+          detail.accountType,
         )
         setCreateDone(true)
         if (!response.success) {
           setError(response.error)
         } else {
+          setTitleRegistered(detail.name)
           setWait('اکاؤنٹ کامیابی سے بنا دیا گیا')
           setError('')
           setDetail({
@@ -172,6 +189,25 @@ const CreateAccount = () => {
     },
   ]
 
+  const accountTypeOptions = [
+    {
+      value: 'خریدار',
+      label: (
+        <div>
+          <FaCircle style={{ color: 'green' }} /> خریدار
+        </div>
+      ),
+    },
+    {
+      value: 'فروخت کنندہ',
+      label: (
+        <div>
+          <FaCircle style={{ color: 'blue' }} /> فروخت کنندہ
+        </div>
+      ),
+    },
+  ]
+
   return (
     <div className="mx-2 app-container app-theme-white body-tabs-shadow">
       <p className={`error-message ${error ? 'active' : ''}`}>{error}</p>
@@ -189,6 +225,47 @@ const CreateAccount = () => {
                         <Link className="btn btn-primary" to="/#/dashboard">
                           ہوم
                         </Link>
+                        {(location.state?.source === 'Landlord' ||
+                          location.state?.source === 'Stock') &&
+                          !location.state?.sourceBuyer && (
+                            <Link
+                              state={{
+                                account: titleRegistered,
+                                quantity: location.state.quantity,
+                                rate: location.state?.rate,
+                                source: location.state.source,
+                              }}
+                              className="mx-2 btn btn-primary"
+                              to="/invoice"
+                            >
+                              زمیندار
+                            </Link>
+                          )}
+                        {location.state?.sourceBuyer && (
+                          <Link
+                            state={{
+                              account: titleRegistered,
+                              member: location.state.member,
+                              quantity: location.state.quantity,
+                              rate: location.state?.rate,
+                              source: location.state.source,
+                              crop: location.state.crop,
+                              landlordName: location.state.landlordName,
+                              customCropName: location.state.customCropName,
+                              calculatedExpenses: location.state.calculatedExpenses,
+                              totalAmount: location.state.totalAmount,
+                              totalPayableAmount: location.state.totalPayableAmount,
+                              completeBags: location.state.completeBags,
+                              incompleteBags: location.state.incompleteBags,
+                              weightStatement: location.state.weightStatement,
+                              buyerInvoices: location.state.buyerInvoices,
+                            }}
+                            className="mx-2 btn btn-primary"
+                            to="/buyer"
+                          >
+                            خریدار
+                          </Link>
+                        )}
                       </h1>
                       <h4 className="mt-2">
                         <div>خوش آمدید،</div>
@@ -306,6 +383,20 @@ const CreateAccount = () => {
                             value={options.find((option) => option.value === detail.status)}
                             onChange={onChangeStatus}
                             options={options}
+                          />
+                        </div>
+                      </div>
+                      <div className="col-md-12">
+                        <div className="position-relative form-group">
+                          اکاؤنٹ کی قسم
+                          <Select
+                            name="status"
+                            id="status"
+                            value={accountTypeOptions.find(
+                              (option) => option.value === detail.accountType,
+                            )}
+                            onChange={onChangeAccountType}
+                            options={accountTypeOptions}
                           />
                         </div>
                       </div>

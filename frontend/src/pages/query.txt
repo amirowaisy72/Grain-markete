@@ -1,9 +1,15 @@
-you have to loop through the object data type, not array, the data structure is as follows
+{landlordName && crop !== 'Select Crop' && rate && (
+        <WeightManager
+          setWeightDone={setWeightDone}
+          setCompleteBags={setCompleteBags}
+          setIncompleteBags={setIncompleteBags}
+          completeBags={completeBags}
+          incompleteBags={incompleteBags}
+          setWeightStatement={setWeightStatement}
+          crop={crop}
+          setQuantity={setQuantity}
+        />
+      )}
 
-Commission:{
-    formula: 1.00,
-    expenseCalculated: 200,
-},
-.....
-
-and so on for all expenses
+i want to add a + and minus button with it, when clicked on it, it gets wrapped dynamically and when clicked on plus, it gets extracted dynamically
+i mean i want to take less space of page, that why i want to wrapp it when it contains data, so that user can see the whole page with less scrolling

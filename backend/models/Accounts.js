@@ -26,6 +26,9 @@ const AccountsSchema = new Schema({
   status: {
     type: String,
   },
+  accountType: {
+    type: String,
+  },
   date: {
     type: Date,
     default: Date.now,

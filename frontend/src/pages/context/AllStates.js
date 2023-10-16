@@ -17,14 +17,30 @@ export const AllStates = (props) => {
 
   //Accounts API
   //Create Account
-  const createAccount = async (name, mobileNumbers, address, guarranter, idCardNumber, status) => {
+  const createAccount = async (
+    name,
+    mobileNumbers,
+    address,
+    guarranter,
+    idCardNumber,
+    status,
+    accountType,
+  ) => {
     //API Call
     const response = await fetch(`${host}/accounts/create`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ name, mobileNumbers, address, guarranter, idCardNumber, status }),
+      body: JSON.stringify({
+        name,
+        mobileNumbers,
+        address,
+        guarranter,
+        idCardNumber,
+        status,
+        accountType,
+      }),
     })
     const json = await response.json()
     return json
@@ -115,6 +131,7 @@ export const AllStates = (props) => {
     titleChange,
     idCard,
     status,
+    accountType,
   ) => {
     //API Call
     const response = await fetch(`${host}/accounts/update/${id}`, {
@@ -130,6 +147,7 @@ export const AllStates = (props) => {
         titleChange,
         idCard,
         status,
+        accountType,
       }),
     })
     const json = await response.json()

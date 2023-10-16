@@ -48,6 +48,7 @@ const UpdateAccount = () => {
     guarranter: location.state.guarranter,
     idCard: location.state.idCard,
     status: location.state.status,
+    accountType: location.state.accountType,
   })
 
   // اکاؤنٹ تلاش کریں
@@ -67,6 +68,10 @@ const UpdateAccount = () => {
 
   const onChangeStatus = (selectedOption) => {
     setData({ ...data, status: selectedOption.value })
+  }
+
+  const onChangeAccountType = (selectedOption) => {
+    setData({ ...data, accountType: selectedOption.value })
   }
 
   // فارم جمع کرنے والا ہینڈلر
@@ -91,6 +96,7 @@ const UpdateAccount = () => {
         titleChange,
         data.idCard,
         data.status,
+        data.accountType,
       )
       if (!response.success) {
         setError(response.error)
@@ -147,6 +153,25 @@ const UpdateAccount = () => {
       label: (
         <div>
           <FaCircle style={{ color: 'red' }} /> Black List
+        </div>
+      ),
+    },
+  ]
+
+  const accountTypeOptions = [
+    {
+      value: 'خریدار',
+      label: (
+        <div>
+          <FaCircle style={{ color: 'green' }} /> خریدار
+        </div>
+      ),
+    },
+    {
+      value: 'فروخت کنندہ',
+      label: (
+        <div>
+          <FaCircle style={{ color: 'blue' }} /> فروخت کنندہ
         </div>
       ),
     },
@@ -280,6 +305,19 @@ const UpdateAccount = () => {
                       value={options.find((option) => option.value === data.status)}
                       onChange={onChangeStatus}
                       options={options}
+                    />
+                  </div>
+                </div>
+
+                <div className="col-md-12">
+                  <div className="position-relative form-group">
+                    اکاؤنٹ کی قسم
+                    <Select
+                      name="status"
+                      id="status"
+                      value={accountTypeOptions.find((option) => option.value === data.accountType)}
+                      onChange={onChangeAccountType}
+                      options={accountTypeOptions}
                     />
                   </div>
                 </div>

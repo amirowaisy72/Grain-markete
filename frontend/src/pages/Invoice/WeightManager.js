@@ -148,12 +148,15 @@ const WeightManager = ({
                 <tr key={index}>
                   <td>پلی {index + 1}</td>
                   <td>
-                    <input
-                      type="number"
-                      className="form-control"
-                      placeholder=""
-                      onChange={(e) => handlePallionValueChange(e, index)}
-                    />
+                    <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+                      <input
+                        type="number"
+                        className="form-control"
+                        placeholder=""
+                        onChange={(e) => handlePallionValueChange(e, index)}
+                      />
+                      <span style={{ marginLeft: '5px' }}>کلوگرام</span>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -171,11 +174,11 @@ const WeightManager = ({
                     </tr>
                     <tr>
                       <td>مجموع وزن:</td>
-                      <td>{Math.round(totalWeight)}</td>
+                      <td>{Math.round(totalWeight)} کلوگرام</td>
                     </tr>
                     <tr>
                       <td>پلی کاٹ</td>
-                      <td>{Math.round((300 * pallionCount) / 1000)}</td>
+                      <td>{Math.round((300 * pallionCount) / 1000)} کلوگرام</td>
                     </tr>
                     <tr>
                       <td>
@@ -187,7 +190,7 @@ const WeightManager = ({
                     </tr>
                     <tr>
                       <td>سانگلی کاٹ 25 گرام</td>
-                      <td>{Math.round((totalWeight / 1000) * 25)}</td>
+                      <td>{Math.round((totalWeight / 1000) * 25)} کلوگرام</td>
                     </tr>
                     <tr>
                       <td>
@@ -202,7 +205,8 @@ const WeightManager = ({
                       <td>
                         {Math.round(totalWeight) -
                           Math.round((300 * pallionCount) / 1000) -
-                          Math.round((totalWeight / 1000) * 25)}
+                          Math.round((totalWeight / 1000) * 25)}{' '}
+                        کلوگرام
                       </td>
                     </tr>
                   </>

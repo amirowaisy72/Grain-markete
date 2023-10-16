@@ -8,8 +8,15 @@ router.post("/create", async (req, res) => {
   let success = false;
   try {
     //store data
-    let { name, mobileNumbers, address, guarranter, idCardNumber, status } =
-      req.body; // de-Structure
+    let {
+      name,
+      mobileNumbers,
+      address,
+      guarranter,
+      idCardNumber,
+      status,
+      accountType,
+    } = req.body; // de-Structure
 
     if (guarranter === "") {
       guarranter = "خود";
@@ -36,6 +43,7 @@ router.post("/create", async (req, res) => {
           guarranter,
           idCardNumber, // Add the idCardNumber
           status,
+          accountType,
         });
         success = true;
         res.send({ success, accounts });
@@ -97,6 +105,7 @@ router.put("/update/:id", async (req, res) => {
       titleChange,
       idCard,
       status,
+      accountType,
     } = req.body; //De-Structure
 
     if (guarranter === "") {
@@ -125,6 +134,9 @@ router.put("/update/:id", async (req, res) => {
     }
     if (status) {
       newData.status = status;
+    }
+    if (accountType) {
+      newData.accountType = accountType;
     }
     //Find the document to be updated and update it
     let accounts = await Accounts.findById(req.params.id);

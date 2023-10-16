@@ -13,6 +13,7 @@ function Invoice() {
   const context = useContext(contextCreator)
   const { createOnlySeller, searchAccount, getExpenseFormulas, expenses, getOthers } = context
 
+  const [accountFound, setAccountFound] = useState(false)
   const [createDone, setCreateDone] = useState(true)
   const [suggestName, setSuggestName] = useState('')
   const [wait, setWait] = useState('')
@@ -28,15 +29,25 @@ function Invoice() {
   const [calculatedExpenses, setCalculatedExpenses] = useState({})
 
   const validCrops = ['Gandum', 'Kapaas', 'Sarson', 'Mirch', 'Moonji']
-  const initialCrop = location.state?.crop
-  const defaultCrop = validCrops.includes(initialCrop) ? initialCrop : 'Deegar'
+  const initialCrop = location.state?.crop ? location.state.crop : ''
+  let defaultCrop
 
-  const [landlordName, setLandlordName] = useState('')
+  if (initialCrop === '') {
+    defaultCrop = 'Select Crop'
+  } else if (validCrops.includes(initialCrop)) {
+    defaultCrop = initialCrop
+  } else {
+    defaultCrop = 'Deegar'
+  }
+
+  const [landlordName, setLandlordName] = useState(
+    location.state?.account ? location.state.account : '',
+  )
   const [crop, setCrop] = useState(location.state ? defaultCrop : 'Select Crop')
   const [outlistedCrops, setOutlistedCrops] = useState([])
   const [customCropName, setCustomCropName] = useState(defaultCrop === 'Deegar' ? initialCrop : '')
   const [quantity, setQuantity] = useState(location.state?.quantity ? location.state.quantity : '')
-  const [rate, setRate] = useState('')
+  const [rate, setRate] = useState(location.state?.rate ? location.state.rate : '')
 
   // Custom expense input fields state
   const [customExpenseName, setCustomExpenseName] = useState('')
@@ -118,6 +129,54 @@ function Invoice() {
     setCustomExpenseFormula('')
   }
 
+  // Fetch recently registered account title if it has come from a state when component mounts
+  useEffect(() => {
+    if (location.state) {
+      if (location.state.account) {
+        const fetchAccount = async () => {
+          let name = location.state.account
+          setLandlordName(name)
+          setPostEntryUpdate('مشابہ اکاؤنٹ چیک کر رہا ہے...')
+          try {
+            let data = await searchAccount(name)
+            setPostEntryUpdate('')
+            if (data.success) {
+              const excludedNames = ['Commission', 'Mazduri', 'Brokery', 'Accountant', 'Market Fee']
+              const displayContent = !excludedNames.includes(data.accounts.name) ? (
+                data.accounts.name
+              ) : (
+                <></>
+              )
+              setSuggestName(displayContent)
+              setAccountFound(true)
+            } else {
+              console.log('Failed 1')
+            }
+          } catch (error) {
+            setPostEntryUpdate('')
+            setSuggestName(
+              <Link
+                state={{
+                  account: name,
+                  quantity: quantity,
+                  rate: rate,
+                  source: location.state?.source || 'Landlord',
+                }}
+                className="btn btn-primary"
+                to="/accounts/create"
+              >
+                اکاؤنٹ نہیں ملا۔ کیا آپ اس نام کے ساتھ نیا اکاؤنٹ بنانا چاہیں گے؟
+              </Link>,
+            )
+            setAccountFound(false)
+          }
+        }
+
+        fetchAccount()
+      }
+    }
+  }, [])
+
   const handleLanslordName = async (e) => {
     let name = capitalizeFirstLetter(e.target.value)
     setLandlordName(name)
@@ -126,10 +185,34 @@ function Invoice() {
       let data = await searchAccount(e.target.value)
       setPostEntryUpdate('')
       if (data.success) {
-        setSuggestName(data.accounts.name)
+        const excludedNames = ['Commission', 'Mazduri', 'Brokery', 'Accountant', 'Market Fee']
+        const displayContent = !excludedNames.includes(data.accounts.name) ? (
+          data.accounts.name
+        ) : (
+          <></>
+        )
+        setSuggestName(displayContent)
+        setAccountFound(true)
+      } else {
+        console.log('Failed 1')
       }
     } catch (error) {
       setPostEntryUpdate('')
+      setSuggestName(
+        <Link
+          state={{
+            account: e.target.value,
+            quantity: quantity,
+            rate: rate,
+            source: location.state?.source || 'Landlord',
+          }}
+          className="btn btn-primary"
+          to="/accounts/create"
+        >
+          اکاؤنٹ نہیں ملا۔ کیا آپ اس نام کے ساتھ نیا اکاؤنٹ بنانا چاہیں گے؟
+        </Link>,
+      )
+      setAccountFound(false)
     }
   }
 
@@ -145,6 +228,25 @@ function Invoice() {
 
   const handleQuantityChange = (e) => {
     const newQuantity = e.target.value
+
+    //quantity Update in new account register link
+    if (!accountFound) {
+      setSuggestName(
+        <Link
+          state={{
+            account: landlordName,
+            quantity: newQuantity,
+            rate: rate,
+            source: location.state?.source || 'Landlord',
+          }}
+          className="btn btn-primary"
+          to="/accounts/create"
+        >
+          اکاؤنٹ نہیں ملا۔ کیا آپ اس نام کے ساتھ نیا اکاؤنٹ بنانا چاہیں گے؟
+        </Link>,
+      )
+    }
+
     setQuantity(newQuantity)
 
     // Step 2: Add validation function
@@ -157,6 +259,25 @@ function Invoice() {
 
   const handleRateChange = (e) => {
     setRate(e.target.value)
+
+    //rate Update in new account register link
+    if (!accountFound) {
+      setSuggestName(
+        <Link
+          state={{
+            account: landlordName,
+            quantity: quantity,
+            rate: e.target.value,
+            source: location.state?.source || 'Landlord',
+          }}
+          className="btn btn-primary"
+          to="/accounts/create"
+        >
+          اکاؤنٹ نہیں ملا۔ کیا آپ اس نام کے ساتھ نیا اکاؤنٹ بنانا چاہیں گے؟
+        </Link>,
+      )
+    }
+
     const newRate = e.target.value
     setRate(newRate)
     // Step 2: Add validation function
@@ -252,7 +373,7 @@ function Invoice() {
           اسٹاک والے پیج پر واپس جائیں۔
         </Link>
       )}
-      {!location.state?.source && (
+      {(location.state?.source === 'Landlord' || !location.state) && (
         <Link className="btn btn-primary" to="/dashboard">
           ڈیش بورڈ
         </Link>
@@ -271,7 +392,7 @@ function Invoice() {
       <h2>
         زمیندار کا بل بنائیں
         <center>
-          {location.state?.crop && (
+          {location.state?.source === 'Stock' && (
             <button
               disabled={!createDone ? true : false}
               onClick={postEntryHandler}
@@ -280,7 +401,7 @@ function Invoice() {
               انٹری پوسٹ کر دیں
             </button>
           )}
-          {!location.state?.crop && (
+          {(location.state?.source === 'Landlord' || !location.state) && (
             <Link
               className={`btn btn-success ${!isFormComplete() ? 'disabled' : ''}`}
               to="/buyer"
@@ -308,7 +429,9 @@ function Invoice() {
       <div className="form-group">
         <button
           onClick={() => {
-            setLandlordName(suggestName)
+            if (typeof suggestName === 'string') {
+              setLandlordName(suggestName)
+            }
           }}
           className="btn btn-primary"
         >
