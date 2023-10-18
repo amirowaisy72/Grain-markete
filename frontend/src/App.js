@@ -47,20 +47,6 @@ const Page500 = React.lazy(() => import('./views/pages/page500/Page500'))
 // Check if localStorage is empty
 const isAuthenticated = !!localStorage.getItem('token')
 
-// Function to decode the token
-const getRole = () => {
-  try {
-    const token = localStorage.getItem('token')
-    const payload = JSON.parse(atob(token.split('.')[1]))
-    return payload.role
-  } catch (error) {
-    return ''
-  }
-}
-
-const role = getRole()
-const expenseSchedulePath = role === 'Admin' ? '/expense_schedule' : '/'
-
 class App extends Component {
   render() {
     return (
@@ -153,7 +139,7 @@ class App extends Component {
               <Route exact path="/printInvoice" name="Print Invoice" element={<Print />} />
               <Route
                 exact
-                path={expenseSchedulePath} // Set the path conditionally
+                path="/expense_schedule" // Set the path conditionally
                 name="Expense Schedule Formula"
                 element={<ExpenseFormulas />}
               />

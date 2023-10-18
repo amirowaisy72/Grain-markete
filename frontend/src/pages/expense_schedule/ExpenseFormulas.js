@@ -203,6 +203,17 @@ const ExpenseFormulas = () => {
     )
   }
 
+  // Function to decode the token
+  const getRole = () => {
+    try {
+      const token = localStorage.getItem('token')
+      const payload = JSON.parse(atob(token.split('.')[1]))
+      return payload.role
+    } catch (error) {
+      return ''
+    }
+  }
+
   return (
     <div>
       <Link className="btn btn-primary" to="/dashboard">
@@ -217,13 +228,11 @@ const ExpenseFormulas = () => {
         </center>
       </h2>
       {wait && <Alert variant="info">{wait}</Alert>}
-      {expenses !== null ? (
+      {expenses !== null && getRole() === 'Admin' && (
         <>
           {renderCropTable('Seller')}
           {renderCropTable('Buyer')}
         </>
-      ) : (
-        <p>Loading data...</p>
       )}
     </div>
   )
