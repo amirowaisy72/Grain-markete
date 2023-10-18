@@ -55,6 +55,17 @@ const DcBook = ({ data, entriesPerPage }) => {
     return formattedAmount
   }
 
+  // Function to decode the token
+  const getRole = () => {
+    try {
+      const token = localStorage.getItem('token')
+      const payload = JSON.parse(atob(token.split('.')[1]))
+      return payload.role
+    } catch (error) {
+      return ''
+    }
+  }
+
   const calculateBalance = () => {
     let balance = 0
     const balanceRows = []
@@ -113,7 +124,7 @@ const DcBook = ({ data, entriesPerPage }) => {
 
             <td>
               {/* Only show edit and delete options for the last entry */}
-              {index === data.length - 1 && item.detail !== 'انوائس' && (
+              {index === data.length - 1 && item.detail !== 'انوائس' && getRole() === 'Admin' && (
                 <>
                   <Link
                     to="/updatedc"

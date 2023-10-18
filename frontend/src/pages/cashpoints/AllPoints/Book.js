@@ -75,6 +75,17 @@ const Book = ({ data, entriesPerPage }) => {
     return hoursSinceCreation <= 3
   }
 
+  // Function to decode the token
+  const getRole = () => {
+    try {
+      const token = localStorage.getItem('token')
+      const payload = JSON.parse(atob(token.split('.')[1]))
+      return payload.role
+    } catch (error) {
+      return ''
+    }
+  }
+
   return (
     <div>
       <div className="table-responsive">
@@ -101,18 +112,20 @@ const Book = ({ data, entriesPerPage }) => {
                   >
                     <FaBook /> {/* دستاویز کے لئے آئیکن */}
                   </Link>
-                  <Link
-                    to="/updateCashPoint"
-                    state={{
-                      id: item._id,
-                      name: item.name,
-                      balance: item.balance,
-                    }}
-                    className="btn btn-warning mr-2"
-                  >
-                    <FaPencilAlt /> {/* ترتیب کے لئے آئیکن */}
-                  </Link>
-                  {isDeleteAllowed(item.date) && (
+                  {getRole() === 'Admin' && (
+                    <Link
+                      to="/updateCashPoint"
+                      state={{
+                        id: item._id,
+                        name: item.name,
+                        balance: item.balance,
+                      }}
+                      className="btn btn-warning mr-2"
+                    >
+                      <FaPencilAlt /> {/* ترتیب کے لئے آئیکن */}
+                    </Link>
+                  )}
+                  {isDeleteAllowed(item.date) && getRole() === 'Admin' && (
                     <Link
                       state={{
                         id: item._id,

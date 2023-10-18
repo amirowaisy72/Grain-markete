@@ -37,6 +37,17 @@ const CashDcBook = ({ data, entriesPerPage }) => {
     }
   }
 
+  // Function to decode the token
+  const getRole = () => {
+    try {
+      const token = localStorage.getItem('token')
+      const payload = JSON.parse(atob(token.split('.')[1]))
+      return payload.role
+    } catch (error) {
+      return ''
+    }
+  }
+
   const calculateBalance = () => {
     let balance = 0
     const balanceRows = []
@@ -61,7 +72,7 @@ const CashDcBook = ({ data, entriesPerPage }) => {
             <td>{index === data.length - 1 ? <strong>بیلنس = {balance}</strong> : balance}</td>
 
             {/* Only show edit and delete options for the last entry */}
-            {index === data.length - 1 && (
+            {index === data.length - 1 && getRole() === 'Admin' && (
               <td>
                 <Link
                   to="/updatecashdc"

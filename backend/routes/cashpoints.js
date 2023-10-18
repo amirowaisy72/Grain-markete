@@ -9,6 +9,7 @@ router.post("/create", async (req, res) => {
   try {
     //store data
     const { name, balance } = req.body; // de-Structure
+    const dateToUse = Date.now();
     const dup = await CashPoints.findOne({
       name: name,
     });
@@ -27,6 +28,7 @@ router.post("/create", async (req, res) => {
         source: "By Yourself",
         customer: "",
         detail: "Cash Point Initialized",
+        date: dateToUse,
       });
       success = true;
       res.send({ success, cashpoints });

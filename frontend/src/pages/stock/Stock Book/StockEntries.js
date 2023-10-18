@@ -92,21 +92,23 @@ const StockEntries = ({ data, entriesPerPage }) => {
 
             <td>
               {/* Only show edit and delete options for the last entry */}
-              {index === data.length - 1 && item.description !== 'انوائس' && (
-                <>
-                  <Link
-                    state={{
-                      id: item._id,
-                      crop: item.crop,
-                      detail: item.description,
-                    }}
-                    className="btn btn-danger"
-                    to="/deleteStock"
-                  >
-                    <FaTrash /> {/* حذف کے لئے آئیکن */}
-                  </Link>
-                </>
-              )}
+              {index === data.length - 1 &&
+                item.description !== 'انوائس' &&
+                getRole() === 'Admin' && (
+                  <>
+                    <Link
+                      state={{
+                        id: item._id,
+                        crop: item.crop,
+                        detail: item.description,
+                      }}
+                      className="btn btn-danger"
+                      to="/deleteStock"
+                    >
+                      <FaTrash /> {/* حذف کے لئے آئیکن */}
+                    </Link>
+                  </>
+                )}
             </td>
           </tr>,
         )
@@ -122,6 +124,17 @@ const StockEntries = ({ data, entriesPerPage }) => {
 
   const totalPages = Math.ceil((Array.isArray(data) ? data.length : 0) / entriesPerPage)
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1)
+
+  // Function to decode the token
+  const getRole = () => {
+    try {
+      const token = localStorage.getItem('token')
+      const payload = JSON.parse(atob(token.split('.')[1]))
+      return payload.role
+    } catch (error) {
+      return ''
+    }
+  }
 
   return (
     <div>

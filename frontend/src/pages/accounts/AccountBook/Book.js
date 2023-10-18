@@ -56,6 +56,17 @@ const Book = ({ data, entriesPerPage }) => {
     return hoursSinceCreation <= 3
   }
 
+  // Function to decode the token
+  const getRole = () => {
+    try {
+      const token = localStorage.getItem('token')
+      const payload = JSON.parse(atob(token.split('.')[1]))
+      return payload.role
+    } catch (error) {
+      return ''
+    }
+  }
+
   return (
     <div>
       <div className="table-responsive">
@@ -93,23 +104,25 @@ const Book = ({ data, entriesPerPage }) => {
                   >
                     <FaBook /> {/* کتاب کے لئے آئکن */}
                   </Link>
-                  <Link
-                    to="/updateAccount"
-                    state={{
-                      id: item._id,
-                      name: item.name,
-                      mobile: item.mobileNumbers,
-                      address: item.address,
-                      guarranter: item.guarranter,
-                      idCard: item.idCardNumber,
-                      status: item.status,
-                      accountType: item.accountType,
-                    }}
-                    className="btn btn-warning mr-2"
-                  >
-                    <FaPencilAlt /> {/* ترتیب کے لئے آئکن */}
-                  </Link>
-                  {isDeleteAllowed(item.date) && (
+                  {getRole() === 'Admin' && (
+                    <Link
+                      to="/updateAccount"
+                      state={{
+                        id: item._id,
+                        name: item.name,
+                        mobile: item.mobileNumbers,
+                        address: item.address,
+                        guarranter: item.guarranter,
+                        idCard: item.idCardNumber,
+                        status: item.status,
+                        accountType: item.accountType,
+                      }}
+                      className="btn btn-warning mr-2"
+                    >
+                      <FaPencilAlt /> {/* ترتیب کے لئے آئکن */}
+                    </Link>
+                  )}
+                  {isDeleteAllowed(item.date) && getRole() === 'Admin' && (
                     <Link
                       state={{
                         id: item._id,

@@ -22,6 +22,17 @@ const AppHeader = () => {
   const dispatch = useDispatch()
   const sidebarShow = useSelector((state) => state.sidebarShow)
 
+  // Function to decode the token
+  const getRole = () => {
+    try {
+      const token = localStorage.getItem('token')
+      const payload = JSON.parse(atob(token.split('.')[1]))
+      return payload.role
+    } catch (error) {
+      return ''
+    }
+  }
+
   return (
     <CHeader position="sticky" className="mb-4">
       <CContainer fluid>
@@ -41,7 +52,7 @@ const AppHeader = () => {
             </CNavLink>
           </CNavItem>
           <CNavItem>
-            <CNavLink to="/dashboard">ایڈمن</CNavLink>
+            <CNavLink to="/dashboard">{getRole() === 'Admin' ? 'ایڈمن' : 'اکاؤنٹنٹ'}</CNavLink>
           </CNavItem>
           <CNavItem>
             <CNavLink t="/dashboard">ترتیبات</CNavLink>

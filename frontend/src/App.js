@@ -1,5 +1,5 @@
 import React, { Component, Suspense } from 'react'
-import { HashRouter, Route, Routes } from 'react-router-dom'
+import { HashRouter, Route, Routes, Navigate } from 'react-router-dom'
 import './scss/style.scss'
 import { AllStates } from './pages/context/AllStates'
 import CreateAccount from './pages/accounts/CreateAccount'
@@ -43,6 +43,23 @@ const Login = React.lazy(() => import('./views/pages/login/Login'))
 const Register = React.lazy(() => import('./views/pages/register/Register'))
 const Page404 = React.lazy(() => import('./views/pages/page404/Page404'))
 const Page500 = React.lazy(() => import('./views/pages/page500/Page500'))
+
+// Check if localStorage is empty
+const isAuthenticated = !!localStorage.getItem('token')
+
+// Function to decode the token
+const getRole = () => {
+  try {
+    const token = localStorage.getItem('token')
+    const payload = JSON.parse(atob(token.split('.')[1]))
+    return payload.role
+  } catch (error) {
+    return ''
+  }
+}
+
+const role = getRole()
+const expenseSchedulePath = role === 'Admin' ? '/expense_schedule' : '/'
 
 class App extends Component {
   render() {
@@ -118,7 +135,11 @@ class App extends Component {
               <Route exact path="/register" name="Register Page" element={<Register />} />
               <Route exact path="/404" name="Page 404" element={<Page404 />} />
               <Route exact path="/500" name="Page 500" element={<Page500 />} />
-              <Route path="*" name="Home" element={<DefaultLayout />} />
+              <Route
+                path="*"
+                name="Home"
+                element={isAuthenticated ? <DefaultLayout /> : <Navigate to="/login" />}
+              />
               {/* Stock */}
               <Route exact path="/stock/inout" name="In/Out" element={<StockCreate />} />
               <Route exact path="/stockBook" name="Stock Book" element={<Stocks />} />
@@ -132,7 +153,7 @@ class App extends Component {
               <Route exact path="/printInvoice" name="Print Invoice" element={<Print />} />
               <Route
                 exact
-                path="/expense_schedule"
+                path={expenseSchedulePath} // Set the path conditionally
                 name="Expense Schedule Formula"
                 element={<ExpenseFormulas />}
               />
@@ -142,6 +163,7 @@ class App extends Component {
                 name="Expense Formulas Edit"
                 element={<EditExpenses />}
               />
+              {/* <Route exact path="/register" name="Register admin" element={<Register />} /> */}
             </Routes>
           </Suspense>
         </HashRouter>

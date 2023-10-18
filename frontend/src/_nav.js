@@ -15,6 +15,17 @@ import {
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
+// Function to decode the token
+const getRole = () => {
+  try {
+    const token = localStorage.getItem('token')
+    const payload = JSON.parse(atob(token.split('.')[1]))
+    return payload.role
+  } catch (error) {
+    return ''
+  }
+}
+
 const _nav = [
   {
     component: CNavItem,

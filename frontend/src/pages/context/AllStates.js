@@ -544,6 +544,112 @@ export const AllStates = (props) => {
     const json = await response.json()
   }
 
+  //Admin Roles
+  //Email confirmation
+  const emailConfirmation = async (email) => {
+    const response = await fetch(`${host}/adminRoles/emailVarification`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    })
+    const json = await response.json()
+    return json
+  }
+
+  //Email confirmation for login page
+  const emailConfirmationLogin = async (email) => {
+    const response = await fetch(`${host}/adminRoles/emailVarificationLogin`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    })
+    const json = await response.json()
+    return json
+  }
+
+  //Create Admin
+  const createAdmin = async (username, email, password) => {
+    const response = await fetch(`${host}/adminRoles/createAdmin`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username, email, password }),
+    })
+    const json = await response.json()
+    return json
+  }
+
+  //Login Admin
+  const loginAdmin = async (email, password) => {
+    const response = await fetch(`${host}/adminRoles/loginAdmin`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    })
+    const json = await response.json()
+    return json
+  }
+
+  //Change Password
+  const changePassword = async (email, password) => {
+    const response = await fetch(`${host}/adminRoles/changePassword`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    })
+    const json = await response.json()
+    return json
+  }
+
+  //get all accountants waiting for Admin
+  const getAccountants = async () => {
+    const response = await fetch(`${host}/adminRoles/getAccountants`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    const json = await response.json()
+    return json.accountants
+  }
+
+  //Update admin as accountant
+  const updateAccountant = async (id) => {
+    //API Call
+    const response = await fetch(`${host}/adminRoles/updateAccountant/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({}),
+    })
+    const json = await response.json()
+    return json
+  }
+
+  //Delete admin as accountant
+  const deleteAccountant = async (id) => {
+    //API Call
+    const response = await fetch(`${host}/adminRoles/deleteAccountant/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({}),
+    })
+    const json = await response.json()
+    return json
+  }
+
   return (
     <>
       <context.Provider
@@ -590,6 +696,14 @@ export const AllStates = (props) => {
           getExpenseFormulas,
           setExpenses,
           updateExpenseFormulas,
+          emailConfirmation,
+          createAdmin,
+          loginAdmin,
+          emailConfirmationLogin,
+          changePassword,
+          getAccountants,
+          updateAccountant,
+          deleteAccountant,
         }}
       >
         {props.children}
