@@ -78,12 +78,28 @@ const ExpenseFormulas = () => {
       <Table responsive striped bordered hover key={sideType}>
         <thead>
           <tr>
-            <th colSpan={cropNames.length + 1}>{sideType} Side</th>
+            <th colSpan={cropNames.length + 1}>
+              {sideType === 'Seller' ? 'زمیندار کے اخراجات' : 'خریدار کے اخراجات'}
+            </th>
           </tr>
           <tr>
-            <th>Expense Type</th>
+            <th>خرچے کا نام</th>
             {cropNames.map((cropName) => (
-              <th key={cropName}>{cropName}</th>
+              <th key={cropName}>
+                {cropName === 'Gandum'
+                  ? 'گندم'
+                  : cropName === 'Kapaas'
+                  ? 'کپاس'
+                  : cropName === 'Sarson'
+                  ? 'سرسوں'
+                  : cropName === 'Mirch'
+                  ? 'مرچ'
+                  : cropName === 'Moonji'
+                  ? 'مونجی'
+                  : cropName === 'Others'
+                  ? 'دیگر'
+                  : ''}
+              </th>
             ))}
           </tr>
         </thead>
@@ -97,7 +113,23 @@ const ExpenseFormulas = () => {
             }
             return (
               <tr key={expenseCategory}>
-                <td>{expenseCategory}</td>
+                <td>
+                  {expenseCategory === 'Commission'
+                    ? 'کمیشن'
+                    : expenseCategory === 'Mazduri'
+                    ? 'مزدوری'
+                    : expenseCategory === 'Brokery'
+                    ? 'دلالی'
+                    : expenseCategory === 'Accountant'
+                    ? 'منشیانہ'
+                    : expenseCategory === 'Market Fee'
+                    ? 'مارکیٹ فیس'
+                    : expenseCategory === 'Sootli'
+                    ? 'سوتلی'
+                    : expenseCategory === 'Ghisai'
+                    ? 'گھسائی'
+                    : ''}
+                </td>
                 {cropNames.map((cropName) => {
                   const cropData = expenses[expenseCategory][sideType][cropName]
                   const formulaKey = `${expenseCategory}_${sideType}_${cropName}`
@@ -106,11 +138,22 @@ const ExpenseFormulas = () => {
                       return (
                         <td key={cropName}>
                           <div>
-                            Formula:
+                            فارمولا:
                             <ul>
                               {Object.entries(cropData.Formula).map(([key, value]) => (
                                 <li key={key}>
-                                  {key}:{' '}
+                                  {key === 'CompleteBag'
+                                    ? 'بوری'
+                                    : key === 'IncompleteBag'
+                                    ? 'توڑا'
+                                    : key === 'PerMand'
+                                    ? 'فی من'
+                                    : key === 'CompleteBagMember'
+                                    ? 'بوری (ممبر)'
+                                    : key === 'CompleteBagNonMember'
+                                    ? 'بوری (غیر ممبر)'
+                                    : ''}
+                                  :{' '}
                                   {value ? (
                                     <>
                                       {/* Conditionally render either the formula or an input field */}
@@ -141,20 +184,20 @@ const ExpenseFormulas = () => {
                                       )}
                                     </>
                                   ) : (
-                                    'N/A'
+                                    'لاگو نہیں ہوتا'
                                   )}
                                 </li>
                               ))}
                             </ul>
                           </div>
-                          <div>Info: {cropData.Info ? cropData.Info : 'N/A'}</div>
+                          <div></div>
                         </td>
                       )
                     } else {
                       return (
                         <td key={cropName}>
                           <div>
-                            Formula:{' '}
+                            فارمولا:{' '}
                             {cropData.Formula ? (
                               <>
                                 {/* Conditionally render either the formula or an input field */}
@@ -184,10 +227,12 @@ const ExpenseFormulas = () => {
                                 )}
                               </>
                             ) : (
-                              'N/A'
+                              'لاگو نہیں ہوتا'
                             )}
                           </div>
-                          <div>Info: {cropData.Info ? cropData.Info : 'N/A'}</div>
+                          <div>
+                            {cropData.Info === '% of total amount' ? 'ٹوٹل رقم کا فیصد' : ''}
+                          </div>
                         </td>
                       )
                     }
@@ -215,15 +260,15 @@ const ExpenseFormulas = () => {
   }
 
   return (
-    <div>
+    <div style={{ margin: '10px' }}>
       <Link className="btn btn-primary" to="/dashboard">
         ڈیش بورڈ
       </Link>
       <h2>
-        Expense Data
+        خرچوں کا شیڈول
         <center>
           <button hidden={updateEnable} onClick={update} className="btn btn-success">
-            Update
+            اپ ڈیٹ
           </button>
         </center>
       </h2>

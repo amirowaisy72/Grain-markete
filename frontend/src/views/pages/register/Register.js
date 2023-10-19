@@ -15,11 +15,12 @@ import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
 import contextCreator from 'src/pages/context/contextCreator'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 const Register = () => {
   const context = useContext(contextCreator)
   const { emailConfirmation, createAdmin } = context
+  const navigate = useNavigate()
 
   // Step 1: Create state variables to store form data and validation errors
   const [formData, setFormData] = useState({
@@ -109,12 +110,14 @@ const Register = () => {
         // Check the user's role
         if (response.admin.role === 'Admin') {
           // Redirect to the admin dashboard
-          window.location.href = '/admin-dashboard' // Replace with the actual URL of the admin dashboard
+          // window.location.href = '/admin-dashboard' // Replace with the actual URL of the admin dashboard
+          navigate('/')
         } else if (response.admin.role === 'Accountant') {
           // Check if the user is allowed by the admin
           if (response.admin.allowedByAdmin) {
             // Redirect to the accountant dashboard
-            window.location.href = '/accountant-dashboard' // Replace with the actual URL of the accountant dashboard
+            // window.location.href = '/accountant-dashboard' // Replace with the actual URL of the accountant dashboard
+            navigate('/')
           } else {
             // Display a message indicating waiting for admin approval
             setWait('عزیز ممبر، ایڈمن آپ کی درخواست کا جائزہ لے رہے ہیں۔ براہ کرم انتظار فرمائیں')

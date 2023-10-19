@@ -1,8 +1,0 @@
-const role = getRole()
-const expenseSchedulePath = role === 'Admin' ? '/expense_schedule' : '/'
-
-change this condition as follows
-if role === 'Admin' expenseSchedulePath = '/expense_schedule'
-if role === 'Accountant' expenseSchedulePath = '/'
-else 
-expenseSchedulePath = '/login'
