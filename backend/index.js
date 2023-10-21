@@ -4,19 +4,6 @@ const app = express();
 connecToMongoose();
 var cors = require("cors");
 
-const fs = require("fs");
-
-const content = "Hello Amir waisy!";
-const fileName = "test.txt";
-
-fs.writeFile(fileName, content, (err) => {
-  if (err) {
-    console.error("Error creating the file:", err);
-  } else {
-    console.log(`File "${fileName}" has been created.`);
-  }
-});
-
 app.use(express.json());
 app.use(cors());
 //Available Routes
