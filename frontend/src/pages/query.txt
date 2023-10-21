@@ -1,0 +1,8 @@
+if (incompleteBags !== undefined or null) {
+              console.log(incompleteBags)
+              expenseCalculated += formula.IncompleteBag * incompleteBags
+            }
+
+incompleteBags !== undefined or null
+
+how to do it corretly?

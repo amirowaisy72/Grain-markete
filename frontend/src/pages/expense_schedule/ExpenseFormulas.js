@@ -152,7 +152,9 @@ const ExpenseFormulas = () => {
                                     ? 'بوری (ممبر)'
                                     : key === 'CompleteBagNonMember'
                                     ? 'بوری (غیر ممبر)'
-                                    : ''}
+                                    : key === 'PerKg'
+                                    ? 'فی کلو'
+                                    : key}
                                   :{' '}
                                   {value ? (
                                     <>

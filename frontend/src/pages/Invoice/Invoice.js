@@ -327,7 +327,6 @@ function Invoice() {
 
   //Apply all expenses automatically
   const applyExpensesAuto = () => {
-    console.log(expenses)
     const calculations = calculateExpenses(
       expenses,
       crop === 'Deegar' ? 'Others' : crop,

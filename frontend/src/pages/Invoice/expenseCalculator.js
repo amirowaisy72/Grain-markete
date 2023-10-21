@@ -35,7 +35,7 @@ function calculateExpenses(
             if (completeBags !== undefined) {
               expenseCalculated = formula.CompleteBag * completeBags
             }
-            if (incompleteBags !== undefined) {
+            if (incompleteBags !== undefined && incompleteBags !== null) {
               expenseCalculated += formula.IncompleteBag * incompleteBags
             }
           } else if (formula && 'CompleteBagMember' in formula) {
@@ -47,7 +47,7 @@ function calculateExpenses(
           } else if (formula && 'PerMand' in formula) {
             expenseCalculated = formula.PerMand * (totalWeightInKgs / 40)
           } else if (formula && 'PerKg' in formula) {
-            expenseCalculated = formula.PerMand * totalWeightInKgs
+            expenseCalculated = formula.PerKg * totalWeightInKgs
           } else {
             //
           }
