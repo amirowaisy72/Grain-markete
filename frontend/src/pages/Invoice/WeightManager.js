@@ -126,6 +126,7 @@ const WeightManager = ({
                     setCompleteBags(e.target.value)
                   }}
                   type="number"
+                  value={completeBags}
                   className="form-control"
                   placeholder=""
                 />

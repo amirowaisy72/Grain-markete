@@ -96,6 +96,8 @@ function Buyer() {
     setMember(event.target.checked)
   }
 
+  console.log(completeBags)
+
   //Add custom expense
   const addCustomExpense = () => {
     if (customExpenseName.trim() === '' || customExpenseFormula.trim() === '') {
@@ -340,7 +342,7 @@ function Buyer() {
     try {
       const calculations = calculateExpenses(
         expenses,
-        crop === 'Deegar' ? 'Others' : crop,
+        crop === 'Sarson' || crop === 'Mirch' || crop === 'Moonji' ? 'Others' : crop,
         (quantity / 40) * rate,
         completeBags,
         incompleteBags,
