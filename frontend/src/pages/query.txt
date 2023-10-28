@@ -1,16 +1,17 @@
-const mongoose = require('mongoose');
-// const url = 'mongodb://0.0.0.0:27017/grain-markete';
-const url = 'mongodb+srv://amirowaisy72:iVVKYSj5rugATyVg@cluster0.mpb1bfz.mongodb.net/grain-markete';
-mongoose.set('strictQuery', false);
+//connect to user collection
+  const connection = async () => {
+    //API Call
+    const response = await fetch(`${host}/connect-to-mongo`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username: 'Zameendara' }),
+    })
+    const json = await response.json()
+    return json
+  }
 
-const connecToMongoose = ()=>{
-    mongoose.connect(url);
-    console.log("Connected to mongodb")
-};
-
-module.exports = connecToMongoose;
-
-this is my code to connect to a collection to my mongodb atlas. 
-right now it is connected to collection "grain-markete"
-but my atlas has multiple collections and i want each user should be connected to their own colection. 
-how to achieve this?
+this is my fetch API in reactjs component.
+how to run this function automatically one time when user opens application?
+it should be connected one time and stay connected with that user collection

@@ -1,11 +1,18 @@
 const connecToMongoose = require("./db");
 const express = require("express");
 const app = express();
-connecToMongoose();
 var cors = require("cors");
 
 app.use(express.json());
 app.use(cors());
+
+//Connec to mongodb
+app.post('/connect-to-mongo', (req, res) => {
+  const { username } = req.body;
+  connecToMongoose(username);
+  res.json({ message: 'Connected to MongoDB' });
+});
+
 //Available Routes
 app.use("/accounts", require("./routes/accounts.js"));
 app.use("/debitcredit", require("./routes/debitcredit.js"));
