@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import context from './contextCreator'
 import PropTypes from 'prop-types' // Import PropTypes
 
@@ -14,32 +14,6 @@ export const AllStates = (props) => {
   const [cashEntries, setCashEntries] = useState([])
   const [stock, setStock] = useState([])
   const [stockEntries, setStockEntries] = useState([])
-
-  //User
-  //connect to user collection
-  const connection = async () => {
-    //API Call
-    const response = await fetch(`${host}/connect-to-mongo`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username: 'zameendara' }),
-    })
-    const json = await response.json()
-    return json
-  }
-
-  useEffect(() => {
-    // Call the connection function when the component mounts
-    connection()
-      .then((result) => {
-        console.log(result) // Handle the result if needed
-      })
-      .catch((error) => {
-        console.error('Error:', error)
-      })
-  }, []) // The empty dependency array ensures the effect runs once when the component mounts
 
   //Accounts API
   //Create Account

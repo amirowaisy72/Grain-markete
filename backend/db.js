@@ -1,20 +1,11 @@
 const mongoose = require('mongoose');
+// const url = 'mongodb://0.0.0.0:27017/grain-markete';
+const url = 'mongodb+srv://amirowaisy72:iVVKYSj5rugATyVg@cluster0.mpb1bfz.mongodb.net/grain-markete';
+mongoose.set('strictQuery', false);
 
-const connectToMongo = (username) => {
-    const dbName = username; // Append the username to the database name
-    const url = `mongodb+srv://amirowaisy72:iVVKYSj5rugATyVg@cluster0.mpb1bfz.mongodb.net/${dbName}`;
-
-    mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
-
-    const db = mongoose.connection;
-
-    db.on('error', (err) => {
-        console.error(`Connection error: ${err}`);
-    });
-
-    db.once('open', () => {
-        console.log(`Connected to MongoDB for user: ${username}`);
-    });
+const connecToMongoose = ()=>{
+    mongoose.connect(url);
+    console.log("Connected to mongodb")
 };
 
-module.exports = connectToMongo;
+module.exports = connecToMongoose;
