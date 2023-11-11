@@ -64,9 +64,22 @@ const CashDcBook = ({ data, entriesPerPage }) => {
       if (index >= startIndex && index < endIndex) {
         balanceRows.push(
           <tr key={item._id}>
-            <td>{item.transactionType === 'Deposit' ? 'جمع کروایا' : 'نکلوایا'}</td>
+            <td>
+              {item.transactionType === 'Deposit' ? 'جمع کروایا' : 'نکلوایا'}
+              <br></br>
+              <span
+                style={{
+                  fontSize: '10px',
+                  backgroundColor: '#ccc',
+                  padding: '2px 5px',
+                  borderRadius: '5px',
+                }}
+              >
+                Created by {item.adminDetail?.username}
+              </span>
+            </td>
             <td>{item.detail}</td>
-            <td>{item.source}</td>
+            <td>{item.source === 'By Customer' ? item.customer : item.source}</td>
             <td>{timeMaker(item.date)}</td>
             <td>{moneyFormatter(item.amount)}</td>
             <td>{index === data.length - 1 ? <strong>بیلنس = {balance}</strong> : balance}</td>

@@ -15,6 +15,7 @@ router.post("/create", async (req, res) => {
       customerName,
       description,
       selectedDate,
+      adminDetail,
     } = req.body;
 
     // Conditionally set the 'date' field
@@ -58,6 +59,7 @@ router.post("/create", async (req, res) => {
           detail: description,
           amount: amount,
           DbCr: transactionType === "Take Out" ? "Debit" : "Credit",
+          adminDetail,
           date: dateToUse,
         });
       }
@@ -70,6 +72,7 @@ router.post("/create", async (req, res) => {
         source,
         customer: source === "By Customer" ? customerName : "",
         detail: description,
+        adminDetail,
         date: dateToUse,
       });
 

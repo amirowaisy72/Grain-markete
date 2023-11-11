@@ -13,6 +13,7 @@ import {
 import contextCreator from 'src/pages/context/contextCreator'
 import { useState, useEffect } from 'react'
 import { FaCircle } from 'react-icons/fa'
+import { Link } from 'react-router-dom'
 
 const WidgetsDropdown = () => {
   const context = useContext(contextCreator)
@@ -80,42 +81,44 @@ const WidgetsDropdown = () => {
   return (
     <CRow>
       <CCol sm={6} lg={3} className="d-flex flex-column">
-        <div className="widget-container">
-          <CWidgetStatsA
-            className="mb-4"
-            color="primary"
-            style={{ height: '200px', overflow: 'auto' }}
-            value={
-              <>
-                اکاؤنٹس
-                <span className="fs-6 fw-normal"> ({dashboardAccounts.totalAccounts})</span>
-                <br />
-                <FaCircle style={{ color: 'green', fontSize: '80%' }} />
-                <span className="fs-6 fw-normal"> ({dashboardAccounts.regularAccounts})</span>
-                <br />
-                <FaCircle style={{ color: 'yellow', fontSize: '80%' }} />
-                <span className="fs-6 fw-normal"> ({dashboardAccounts.highRiskAccounts})</span>
-                <br />
-                <FaCircle style={{ color: 'red', fontSize: '80%' }} />
-                <span className="fs-6 fw-normal"> ({dashboardAccounts.blackListedAccounts})</span>
-              </>
-            }
-            title=""
-            action={
-              <CDropdown alignment="end">
-                <CDropdownToggle color="transparent" caret={false} className="p-0">
-                  <CIcon icon="cilOptions" className="text-high-emphasis-inverse" />
-                </CDropdownToggle>
-                <CDropdownMenu>
-                  <CDropdownItem>Action</CDropdownItem>
-                  <CDropdownItem>Another action</CDropdownItem>
-                  <CDropdownItem>Something else here...</CDropdownItem>
-                  <CDropdownItem disabled>Disabled action</CDropdownItem>
-                </CDropdownMenu>
-              </CDropdown>
-            }
-          />
-        </div>
+        <Link to="/accountbook" style={{ textDecoration: 'none' }}>
+          <div className="widget-container">
+            <CWidgetStatsA
+              className="mb-4"
+              color="primary"
+              style={{ height: '200px', overflow: 'auto' }}
+              value={
+                <>
+                  اکاؤنٹس
+                  <span className="fs-6 fw-normal"> ({dashboardAccounts.totalAccounts})</span>
+                  <br />
+                  <FaCircle style={{ color: 'green', fontSize: '80%' }} />
+                  <span className="fs-6 fw-normal"> ({dashboardAccounts.regularAccounts})</span>
+                  <br />
+                  <FaCircle style={{ color: 'yellow', fontSize: '80%' }} />
+                  <span className="fs-6 fw-normal"> ({dashboardAccounts.highRiskAccounts})</span>
+                  <br />
+                  <FaCircle style={{ color: 'red', fontSize: '80%' }} />
+                  <span className="fs-6 fw-normal"> ({dashboardAccounts.blackListedAccounts})</span>
+                </>
+              }
+              title=""
+              action={
+                <CDropdown alignment="end">
+                  <CDropdownToggle color="transparent" caret={false} className="p-0">
+                    <CIcon icon="cilOptions" className="text-high-emphasis-inverse" />
+                  </CDropdownToggle>
+                  <CDropdownMenu>
+                    <CDropdownItem>Action</CDropdownItem>
+                    <CDropdownItem>Another action</CDropdownItem>
+                    <CDropdownItem>Something else here...</CDropdownItem>
+                    <CDropdownItem disabled>Disabled action</CDropdownItem>
+                  </CDropdownMenu>
+                </CDropdown>
+              }
+            />
+          </div>
+        </Link>
       </CCol>
       <CCol sm={6} lg={3} className="d-flex flex-column">
         <div className="widget-container">

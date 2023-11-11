@@ -22,6 +22,7 @@ export const DebitCredit = () => {
       setWait('')
       if (data.success && data.accounts) {
         setTitle(data.accounts)
+        setTitleBalance(data.balance)
       }
     } catch (error) {
       setError('Some other problem occured')
@@ -39,6 +40,7 @@ export const DebitCredit = () => {
 
   // دوسرے حالات
   const [title, setTitle] = useState({})
+  const [titleBalance, setTitleBalance] = useState('')
   const [wait, setWait] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -65,11 +67,11 @@ export const DebitCredit = () => {
       ) {
         setError('تمام فیلڈز بھریں')
       } else if (!validAmountRegex.test(detail.amount)) {
-        setError('غلط رقبہ. براہ کرم درست رقم (روپوں میں) درج کریں۔')
+        setError('غلط رقم. براہ کرم درست رقم (روپوں میں) درج کریں۔')
       } else {
         const response = await searchDcAccount(detail.name)
         if (response.success) {
-          if (response.accounts.length === 0) {
+          if (!response.accounts) {
             setError('غلط عنوان یا عنوان نہیں ملا')
           } else {
             const create = await createDc(
@@ -100,7 +102,7 @@ export const DebitCredit = () => {
       setWait('')
     } catch (error) {
       setWait('')
-      setError('Some other problem occured')
+      setError(error.message)
     }
   }
 
@@ -139,9 +141,20 @@ export const DebitCredit = () => {
               </p>
               <p style={{ color: 'green' }}>{success}</p>
               {title ? (
-                <div onClick={copyTitle} className="btn btn-primary">
-                  {title.name}
-                </div>
+                <>
+                  <div onClick={copyTitle} className="btn btn-primary">
+                    {title.name}
+                  </div>
+                  <div className="btn btn-primary mx-2">
+                    {titleBalance < 0
+                      ? `(نام) ${titleBalance} روپے`
+                      : titleBalance > 0
+                      ? `(جمع) ${titleBalance} روپے`
+                      : titleBalance === 0
+                      ? 'صفر'
+                      : ''}
+                  </div>
+                </>
               ) : (
                 ''
               )}

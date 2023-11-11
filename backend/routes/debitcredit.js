@@ -8,7 +8,7 @@ router.post("/create", async (req, res) => {
   let success = false;
   try {
     //store data
-    const { name, detail, amount, DbCr, selectedDate } = req.body; // de-Structure
+    const { name, detail, amount, DbCr, selectedDate, adminDetail } = req.body; // de-Structure
     // Conditionally set the 'date' field
     const dateToUse = selectedDate ? selectedDate : Date.now();
     let dc = await Dc.create({
@@ -16,6 +16,7 @@ router.post("/create", async (req, res) => {
       detail: detail,
       amount: amount,
       DbCr: DbCr,
+      adminDetail,
       date: dateToUse,
     });
     success = true;

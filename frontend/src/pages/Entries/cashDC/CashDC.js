@@ -16,6 +16,7 @@ function CashDC() {
   const [success, setSuccess] = useState('')
   const [customerTitle, setCustomerTitle] = useState({})
   const [createDone, setCreateDone] = useState(true)
+  const [titleBalance, setTitleBalance] = useState('')
 
   // Search Cash Point
   const searchPoint = async () => {
@@ -44,6 +45,7 @@ function CashDC() {
       setWait('')
       if (data.success && data.accounts) {
         setCustomerTitle(data.accounts)
+        setTitleBalance(data.balance)
       }
     } catch (error) {
       setWait('')
@@ -261,9 +263,20 @@ function CashDC() {
         {formData.source === 'By Customer' && (
           <>
             {customerTitle ? (
-              <div onClick={copyCustomerTitle} className="btn btn-primary">
-                {customerTitle.name}
-              </div>
+              <>
+                <div onClick={copyCustomerTitle} className="btn btn-primary">
+                  {customerTitle.name}
+                </div>
+                <div className="btn btn-primary mx-2">
+                  {titleBalance < 0
+                    ? `(نام) ${titleBalance} روپے`
+                    : titleBalance > 0
+                    ? `(جمع) ${titleBalance} روپے`
+                    : titleBalance === 0
+                    ? 'صفر'
+                    : ''}
+                </div>
+              </>
             ) : (
               ''
             )}

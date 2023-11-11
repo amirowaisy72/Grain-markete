@@ -29,6 +29,9 @@ const AccountsSchema = new Schema({
   accountType: {
     type: String,
   },
+  adminDetail:{
+    type: Object,
+  },
   date: {
     type: Date,
     default: Date.now,

@@ -114,7 +114,7 @@ const Register = () => {
           navigate('/')
         } else if (response.admin.role === 'Accountant') {
           // Check if the user is allowed by the admin
-          if (response.admin.allowedByAdmin) {
+          if (response.admin.allowedByAdmin && response.admin.active) {
             // Redirect to the accountant dashboard
             // window.location.href = '/accountant-dashboard' // Replace with the actual URL of the accountant dashboard
             navigate('/')

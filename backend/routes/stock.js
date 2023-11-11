@@ -7,12 +7,13 @@ router.post("/create", async (req, res) => {
   let success = false;
   try {
     //store data
-    const { crop, inout, quantity, description } = req.body; // de-Structure
+    const { crop, inout, quantity, description, adminDetail } = req.body; // de-Structure
     let stock = await Stock.create({
       crop: crop,
       inout: inout,
       quantity: quantity,
       description: description,
+      adminDetail,
     });
     success = true;
     res.send({ success, stock });

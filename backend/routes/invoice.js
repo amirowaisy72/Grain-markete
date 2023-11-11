@@ -22,6 +22,7 @@ router.post("/createOnlySeller", async (req, res) => {
       calculatedExpenses,
       totalPayableAmount,
       weightStatement,
+      adminDetail,
     } = req.body;
 
     totalPayableAmount = Math.round(totalPayableAmount);
@@ -51,6 +52,7 @@ router.post("/createOnlySeller", async (req, res) => {
             calculatedExpenses: calculatedExpenses,
             totalPayableAmount: totalPayableAmount,
             weightStatement: weightStatement,
+            adminDetail,
             date: Date.now(),
           },
         ],
@@ -74,6 +76,7 @@ router.post("/createOnlySeller", async (req, res) => {
               calculatedExpenses: calculatedExpenses,
               totalPayableAmount: totalPayableAmount,
               weightStatement: weightStatement,
+              adminDetail,
             },
           ],
           { session }
@@ -107,6 +110,7 @@ router.post("/createOnlySeller", async (req, res) => {
                     {
                       name: expenseType, // Add the name of the recognized expense
                       status: "Regular",
+                      adminDetail,
                     },
                   ],
                   { session }
@@ -128,6 +132,8 @@ router.post("/createOnlySeller", async (req, res) => {
                     calculatedExpenses: calculatedExpenses,
                     totalPayableAmount: totalPayableAmount,
                     weightStatement: weightStatement,
+                    adminDetail,
+                    otherDetail: `${customer} - Seller`,
                     date: Date.now(),
                   },
                 ],
@@ -170,7 +176,7 @@ router.post("/createBuyerSeller", async (req, res) => {
 
   try {
     // Get Data from user
-    const { allInvoices } = req.body;
+    const { allInvoices, adminDetail } = req.body;
 
     for (const invoice of allInvoices) {
       // Destructure invoice data
@@ -215,6 +221,7 @@ router.post("/createBuyerSeller", async (req, res) => {
             calculatedExpenses: calculatedExpenses,
             totalPayableAmount: totalPayableAmount,
             weightStatement: weightStatement,
+            adminDetail,
             date: Date.now(),
           },
         ],
@@ -244,6 +251,7 @@ router.post("/createBuyerSeller", async (req, res) => {
               calculatedExpenses: calculatedExpenses,
               totalPayableAmount: totalPayableAmount,
               weightStatement: weightStatement,
+              adminDetail,
             },
           ],
           { session }
@@ -256,7 +264,13 @@ router.post("/createBuyerSeller", async (req, res) => {
         break; // Exit the loop on the first error
       }
 
-      const recognizedExpenses = ["Commission", "Mazduri", "Market Fee"];
+      const recognizedExpenses = [
+        "Commission",
+        "Mazduri",
+        "Market Fee",
+        "Brokery",
+        "Accountant",
+      ];
 
       for (const expenseType in calculatedExpenses) {
         if (recognizedExpenses.includes(expenseType)) {
@@ -274,6 +288,7 @@ router.post("/createBuyerSeller", async (req, res) => {
                 {
                   name: expenseType, // Add the name of the recognized expense
                   status: "Regular",
+                  adminDetail,
                 },
               ],
               { session }
@@ -285,7 +300,7 @@ router.post("/createBuyerSeller", async (req, res) => {
             [
               {
                 name: expenseType,
-                detail: "انوائس",
+                detail: `انوائس`,
                 amount: Math.round(currentExpense.expenseCalculated), // Use your specific logic for amount
                 DbCr: "Credit",
                 crop: crop,
@@ -295,6 +310,8 @@ router.post("/createBuyerSeller", async (req, res) => {
                 calculatedExpenses: calculatedExpenses,
                 totalPayableAmount: totalPayableAmount,
                 weightStatement: weightStatement,
+                adminDetail,
+                otherDetail: `${customer} - ${customerType}`,
                 date: Date.now(),
               },
             ],

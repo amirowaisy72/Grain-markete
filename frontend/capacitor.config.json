@@ -1,6 +1,6 @@
 {
-    "appId": "io.ionic.Business",
-    "appName": "Business",
+    "appId": "io.ionic.Almadina",
+    "appName": "Almadina",
     "bundledWebRuntime": false,
     "npmClient": "npm",
     "webDir": "build",

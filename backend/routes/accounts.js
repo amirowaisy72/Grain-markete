@@ -16,6 +16,7 @@ router.post("/create", async (req, res) => {
       idCardNumber,
       status,
       accountType,
+      adminDetail,
     } = req.body; // de-Structure
 
     if (guarranter === "") {
@@ -44,6 +45,7 @@ router.post("/create", async (req, res) => {
           idCardNumber, // Add the idCardNumber
           status,
           accountType,
+          adminDetail,
         });
         success = true;
         res.send({ success, accounts });
@@ -67,15 +69,37 @@ router.get("/read", async (req, res) => {
 
 // {Search Operation} ADMIN
 router.get("/search/:name", async (req, res) => {
-  let success = false;
   try {
+    // Step 1: Search for the account
     const accounts = await Accounts.findOne({
       name: new RegExp(req.params.name, "i"),
-    }); //
-    success = true;
-    res.send({ success, accounts });
+    });
+
+    if (!accounts) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Account not found" });
+    }
+
+    // Step 2: Fetch documents from Dc modal where name matches
+    const documents = await Dc.find({ name: accounts.name });
+
+    // Step 3: Calculate the balance
+    let balance = 0;
+
+    documents.forEach((doc) => {
+      // Assuming doc.amount is the field representing the amount
+      if (doc.DbCr === "Credit") {
+        balance += doc.amount;
+      } else if (doc.DbCr === "Debit") {
+        balance -= doc.amount;
+      }
+    });
+
+    // Step 4: Send the response with balance
+    res.json({ success: true, accounts, balance });
   } catch (error) {
-    res.status(500).json({ success, error: error.message });
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
@@ -279,6 +303,54 @@ router.get("/accountsBlock", async (req, res) => {
     // Handle any errors here
     console.error(error);
     res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.get("/getAddresses", async (req, res) => {
+  try {
+    // Fetch only those accounts from the Accounts model where the address field exists
+    const accounts = await Accounts.find(
+      { address: { $exists: true } },
+      "address"
+    );
+
+    // Extract unique addresses from the accounts
+    const uniqueAddresses = [
+      ...new Set(accounts.map((account) => account.address)),
+    ];
+
+    // Arrange the data in the specified pattern
+    const formattedAddresses = uniqueAddresses.map((address) => ({
+      name: address,
+    }));
+
+    res.json({ addresses: formattedAddresses });
+  } catch (error) {
+    console.error("Error fetching addresses:", error.message);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+router.get("/guarranters/:customer", async (req, res) => {
+  try {
+    const customer = req.params.customer;
+
+    // Find the document where the customer is the name and get guarranter
+    const guarrantyTaken = await Accounts.findOne({ name: customer }).select(
+      "guarranter"
+    );
+
+    // Find the document where the guarranter is the customer and get the name
+    const guarrantyGiven = await Accounts.findOne({
+      guarranter: customer,
+    }).select("name");
+
+    res.send({
+      guarrantyGiven: guarrantyGiven?.name,
+      guarrantyTaken: guarrantyTaken?.guarranter,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 

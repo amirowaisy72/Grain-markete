@@ -6,7 +6,7 @@ import contextCreator from 'src/pages/context/contextCreator'
 const DcCmoponent = () => {
   // اسٹیٹ کی فنکشنز اور متغیرات
   const context = useContext(contextCreator)
-  const { getEntries, dc } = context
+  const { getEntries, dc, getGuarrenty } = context
 
   // لوکیشن نیویگیٹر
   const location = useLocation()
@@ -18,17 +18,25 @@ const DcCmoponent = () => {
   // پورٹ فولیو لوڈ کریں
   useEffect(() => {
     async function fetchEntries() {
-      // آپ یہاں انتظار کرسکتے ہیں
       setLoading('انٹریز لوڈ ہو رہی ہیں...')
       await getEntries(location.state.name)
-      console.log(dc)
-      // ...
       setLoading('')
     }
     fetchEntries()
   }, []) // یا [] اگر اثر کو پراپس یا اسٹیٹ کی ضرورت نہیں ہے
 
-  // نمونہ ڈیٹا
+  const [guarranter, setGuarrenter] = useState('')
+  const [guarrenty, setGuarrenty] = useState('')
+
+  useEffect(() => {
+    async function fetchGuarrenty() {
+      const response = await getGuarrenty(location.state.name)
+      setGuarrenty(response.guarrantyGiven)
+      setGuarrenter(response.guarrantyTaken)
+    }
+    fetchGuarrenty()
+  }, [])
+
   const data = dc
 
   const entriesPerPage = 5
@@ -44,6 +52,10 @@ const DcCmoponent = () => {
         <center>
           <h1>{location.state.name} اکاؤنٹ</h1>
           <p>{loading}</p>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <h3 style={{ float: 'left' }}>گارنٹر: {guarranter}</h3>
+            <h3 style={{ float: 'right' }}>گارنٹی: {guarrenty}</h3>
+          </div>
         </center>
         <DcBook data={data} entriesPerPage={entriesPerPage} />
       </div>

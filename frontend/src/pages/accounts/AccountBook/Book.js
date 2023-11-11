@@ -3,9 +3,38 @@ import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { FaBook, FaPencilAlt, FaTrash } from 'react-icons/fa' // react-icons کتابخانے سے آئیکنز کو شامل کریں
 import moment, { months } from 'moment/moment'
+import ListPrint from './ListPrint'
 
 const Book = ({ data, entriesPerPage }) => {
   const [currentPage, setCurrentPage] = useState(1)
+  const [selectedEntries, setSelectedEntries] = useState([])
+  const [selectAll, setSelectAll] = useState(false)
+
+  const handleCheckUncheckAll = () => {
+    setSelectAll(!selectAll)
+
+    if (!selectAll) {
+      // Select all entries
+      const allIds = data.map((item) => item._id)
+      setSelectedEntries(allIds)
+    } else {
+      // Unselect all entries
+      setSelectedEntries([])
+    }
+  }
+
+  const handleCheckboxChange = (accountId) => {
+    const updatedSelectedEntries = [...selectedEntries]
+    const index = updatedSelectedEntries.indexOf(accountId)
+
+    if (index !== -1) {
+      updatedSelectedEntries.splice(index, 1)
+    } else {
+      updatedSelectedEntries.push(accountId)
+    }
+
+    setSelectedEntries(updatedSelectedEntries)
+  }
 
   const displayData = () => {
     const startIndex = (currentPage - 1) * entriesPerPage
@@ -21,30 +50,45 @@ const Book = ({ data, entriesPerPage }) => {
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1)
 
   const getStatusColor = (status) => {
-    let backgroundColor, textColor
+    let backgroundColor, textColor, fontSize, padding, borderRadius
 
     switch (status) {
       case 'Regular':
         backgroundColor = '#33B81B'
         textColor = 'white'
+        fontSize = '15px'
+        padding = '2px 5px'
+        borderRadius = '5px'
         break
       case 'High Risk':
         backgroundColor = '#D7D414'
         textColor = '#FFFFF1'
+        fontSize = '15px'
+        padding = '2px 5px'
+        borderRadius = '5px'
         break
       case 'Black List':
         backgroundColor = 'red'
         textColor = 'white'
+        fontSize = '15px'
+        padding = '2px 5px'
+        borderRadius = '5px'
         break
       default:
         backgroundColor = 'transparent'
         textColor = 'black'
+        fontSize = '15px'
+        padding = '2px 5px'
+        borderRadius = '5px'
         break
     }
 
     return {
       backgroundColor,
       color: textColor,
+      fontSize,
+      padding,
+      borderRadius,
     }
   }
 
@@ -52,7 +96,6 @@ const Book = ({ data, entriesPerPage }) => {
     const creationTime = moment(date)
     const currentTime = moment()
     const hoursSinceCreation = currentTime.diff(creationTime, 'hours')
-    console.log('Hours Since Creation:', hoursSinceCreation)
     return hoursSinceCreation <= 3
   }
 
@@ -69,10 +112,17 @@ const Book = ({ data, entriesPerPage }) => {
 
   return (
     <div>
+      <div>
+        {/* Single checkbox for "Check/Uncheck All" */}
+        <input type="checkbox" onChange={handleCheckUncheckAll} checked={selectAll} />
+        {/* Render ListPrint with selectedEntries and data */}
+        {selectedEntries.length > 0 && <ListPrint selectedEntries={selectedEntries} data={data} />}
+      </div>
       <div className="table-responsive">
         <table className="table table-striped table-bordered table-hover">
           <thead>
             <tr>
+              <th></th>
               <th>نام</th>
               <th>موبائل نمبر</th>
               <th>شناختی کارڈ نمبر</th>
@@ -85,7 +135,27 @@ const Book = ({ data, entriesPerPage }) => {
           <tbody>
             {displayData().map((item) => (
               <tr key={item._id}>
-                <td style={getStatusColor(item.status)}>{item.name}</td>
+                <td>
+                  <input
+                    type="checkbox"
+                    onChange={() => handleCheckboxChange(item._id)}
+                    checked={selectedEntries.includes(item._id)}
+                  />
+                </td>
+                <td>
+                  <span style={getStatusColor(item.status)}>{item.name}</span>
+                  <br></br>
+                  <span
+                    style={{
+                      fontSize: '10px',
+                      backgroundColor: '#ccc',
+                      padding: '2px 5px',
+                      borderRadius: '5px',
+                    }}
+                  >
+                    Created by {item.adminDetail?.username}
+                  </span>
+                </td>
 
                 <td>
                   {item.mobileNumbers.map((number, index) => (

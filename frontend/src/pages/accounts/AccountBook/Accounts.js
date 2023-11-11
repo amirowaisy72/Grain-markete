@@ -6,11 +6,26 @@ import contextCreator from 'src/pages/context/contextCreator'
 const Accounts = () => {
   // اسٹیٹ کی فنکشنز اور متغیرات
   const context = useContext(contextCreator)
-  const { getAccounts, accounts, searchAccountAll } = context
+  const { getAccounts, accounts, searchAccountAll, getAddresses, searchByAddress } = context
 
   // اسٹیٹز
   const [wait, setWait] = useState('')
   const [loading, setLoading] = useState('')
+  const [addressSuggestions, setAddressSuggestions] = useState([])
+
+  useEffect(() => {
+    try {
+      async function fetchaddresses() {
+        // setWait('فارمولا لوڈ ہو رہے ہیں')
+        const response = await getAddresses()
+        setAddressSuggestions(response)
+        // Assuming response is a valid object
+        // ...
+        // setWait('')
+      }
+      fetchaddresses()
+    } catch (error) {}
+  }, [])
 
   // پورٹ فولیو لوڈ کریں
   useEffect(() => {
@@ -35,12 +50,16 @@ const Accounts = () => {
 
   const handleSearch = async (e) => {
     try {
-      setLoading('تلاش کر رہا ہے...')
+      // setLoading('تلاش کر رہا ہے...')
       await searchAccountAll(e.target.value)
-      setWait('')
+      // setWait('')
     } catch (error) {
       setLoading('Some other problem occured')
     }
+  }
+
+  const handleAddressSearch = async (address) => {
+    await searchByAddress(address)
   }
 
   return (
@@ -54,12 +73,30 @@ const Accounts = () => {
         <center>
           <h1>اکاؤنٹس کتاب</h1>
           <p>{loading}</p>
-          <input
-            className="form-control mb-3"
-            onKeyUp={handleSearch}
-            type="text"
-            placeholder="اکاؤنٹس تلاش کریں..."
-          />
+          {/* Dropdown for address suggestions */}
+          <div className="row mb-3">
+            <div className="col-md-6">
+              <select
+                className="form-control"
+                onChange={(e) => handleAddressSearch(e.target.value)}
+              >
+                <option value="">ایڈریس کو فلٹر کریں</option>
+                {addressSuggestions.map((address, index) => (
+                  <option key={index} value={address.name}>
+                    {address.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="col-md-6">
+              <input
+                className="form-control"
+                onKeyUp={handleSearch}
+                type="text"
+                placeholder="اکاؤنٹس تلاش کریں..."
+              />
+            </div>
+          </div>
         </center>
         <Book data={data} entriesPerPage={entriesPerPage} />
       </div>

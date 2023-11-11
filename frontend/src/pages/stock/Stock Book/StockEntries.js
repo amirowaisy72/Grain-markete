@@ -53,7 +53,20 @@ const StockEntries = ({ data, entriesPerPage }) => {
       if (index >= startIndex && index < endIndex) {
         quantityRows.push(
           <tr key={item._id}>
-            <td>{item.inout === 'In' ? 'ان' : 'آؤٹ'}</td>
+            <td>
+              {item.inout === 'In' ? 'ان' : 'آؤٹ'}
+              <br></br>
+              <span
+                style={{
+                  fontSize: '10px',
+                  backgroundColor: '#ccc',
+                  padding: '2px 5px',
+                  borderRadius: '5px',
+                }}
+              >
+                Created by {item.adminDetail?.username}
+              </span>
+            </td>
             <td>{item.quantity}</td>
             <td>
               {item.description === 'انوائس' ? (

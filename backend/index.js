@@ -16,6 +16,7 @@ app.use("/invoice", require("./routes/invoice.js"));
 app.use("/todaytimeline", require("./routes/todaytimeline.js"));
 app.use("/expenseFormulas", require("./routes/expenseFormulas.js"));
 app.use("/adminRoles", require("./routes/adminRoles.js"));
+app.use("/address", require("./routes/address.js"));
 
 app.listen(5000, () => {
   console.log("listening at port 5000");

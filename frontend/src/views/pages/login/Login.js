@@ -70,30 +70,34 @@ const Login = () => {
 
   const handleLogin = async () => {
     if (validateForm()) {
-      setWait('آپ کو لاگ ان کیا جا رہا ہے۔  مہربانی انتظار فرمائیں')
-      const response = await loginAdmin(formData.email, formData.password)
+      try {
+        setWait('آپ کو لاگ ان کیا جا رہا ہے۔  مہربانی انتظار فرمائیں')
+        const response = await loginAdmin(formData.email, formData.password)
 
-      if (response.success) {
-        // Store the token securely, e.g., in localStorage
-        localStorage.setItem('token', response.token)
-        // Check the user's role
-        if (response.user.role === 'Admin') {
-          // Redirect to the admin dashboard
-          // window.location.href = '/admin-dashboard' // Replace with the actual URL of the admin dashboard/
-          navigate('/')
-        } else if (response.user.role === 'Accountant') {
-          // Check if the user is allowed by the admin
-          if (response.user.allowedByAdmin) {
-            // Redirect to the accountant dashboard
-            // window.location.href = '/accountant-dashboard' // Replace with the actual URL of the accountant dashboard
+        if (response.success) {
+          // Store the token securely, e.g., in localStorage
+          localStorage.setItem('token', response.token)
+          // Check the user's role
+          if (response.user.role === 'Admin') {
+            // Redirect to the admin dashboard
+            // window.location.href = '/admin-dashboard' // Replace with the actual URL of the admin dashboard/
             navigate('/')
-          } else {
-            // Display a message indicating waiting for admin approval
-            setWait('عزیز ممبر، ایڈمن آپ کی درخواست کا جائزہ لے رہے ہیں۔ براہ کرم انتظار فرمائیں')
+          } else if (response.user.role === 'Accountant') {
+            // Check if the user is allowed by the admin
+            if (response.user.allowedByAdmin && response.user.active) {
+              // Redirect to the accountant dashboard
+              // window.location.href = '/accountant-dashboard' // Replace with the actual URL of the accountant dashboard
+              navigate('/')
+            } else {
+              // Display a message indicating waiting for admin approval
+              setWait('عزیز ممبر، ایڈمن آپ کی درخواست کا جائزہ لے رہے ہیں۔ براہ کرم انتظار فرمائیں')
+            }
           }
+        } else {
+          setWait(response.message)
         }
-      } else {
-        setWait(response.message)
+      } catch (error) {
+        setWait('Not connected to internet')
       }
     }
   }

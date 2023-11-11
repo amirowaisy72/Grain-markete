@@ -315,7 +315,7 @@ function Buyer() {
         quantity: location.state.quantity,
         weightStatement: location.state.weightStatement,
         rate: location.state.rate,
-        calculateExpenses: location.state.calculateExpenses,
+        calculatedExpenses: location.state.calculatedExpenses,
         totalAmount: location.state.totalAmount,
         totalPayableAmount: location.state.totalPayableAmount,
       }
@@ -328,7 +328,6 @@ function Buyer() {
     // Set the invoices to state to display all invoices
     setInvoices(allInvoices)
   }
-
   // Function to capitalize the first letter of every word
   const capitalizeFirstLetter = (str) => {
     return str
@@ -484,7 +483,7 @@ function Buyer() {
         quantity: location.state.quantity,
         weightStatement,
         rate: location.state.rate,
-        calculatedExpenses: location.state.calculateExpenses,
+        calculatedExpenses: location.state.calculatedExpenses,
         totalAmount: location.state.totalAmount,
         totalPayableAmount: location.state.totalPayableAmount,
       }

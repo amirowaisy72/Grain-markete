@@ -1,17 +1,9 @@
-//connect to user collection
-  const connection = async () => {
-    //API Call
-    const response = await fetch(`${host}/connect-to-mongo`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username: 'Zameendara' }),
-    })
-    const json = await response.json()
-    return json
-  }
+{guarranter ||
+            (guarrenty && (
+              <div>
+                <h3>گارنٹر: {guarranter}</h3>
+                <h3>گارنٹی: {guarrenty}</h3>
+              </div>
+            ))}
 
-this is my fetch API in reactjs component.
-how to run this function automatically one time when user opens application?
-it should be connected one time and stay connected with that user collection
+i want guarranter left floated and guarranty right floated

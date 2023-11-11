@@ -9,11 +9,23 @@ export const AllStates = (props) => {
   //   const host = ""
   //States
   const [accounts, setAccounts] = useState([])
+  const [originalAccounts, setOriginalAccounts] = useState([])
   const [cashPoints, setCashPoints] = useState([])
   const [dc, setDc] = useState([])
   const [cashEntries, setCashEntries] = useState([])
   const [stock, setStock] = useState([])
   const [stockEntries, setStockEntries] = useState([])
+
+  // Function to decode the token
+  const getAdminDetail = () => {
+    try {
+      const token = localStorage.getItem('token')
+      const payload = JSON.parse(atob(token.split('.')[1]))
+      return payload
+    } catch (error) {
+      return ''
+    }
+  }
 
   //Accounts API
   //Create Account
@@ -26,6 +38,7 @@ export const AllStates = (props) => {
     status,
     accountType,
   ) => {
+    const adminDetail = getAdminDetail()
     //API Call
     const response = await fetch(`${host}/accounts/create`, {
       method: 'POST',
@@ -40,10 +53,22 @@ export const AllStates = (props) => {
         idCardNumber,
         status,
         accountType,
+        adminDetail,
       }),
     })
     const json = await response.json()
     return json
+  }
+
+  const getAddresses = async () => {
+    const response = await fetch(`${host}/accounts/getAddresses`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    const json = await response.json()
+    return json.addresses
   }
 
   //Search account
@@ -59,17 +84,33 @@ export const AllStates = (props) => {
     return json
   }
 
-  //Search account
-  const searchAccountAll = async (name) => {
-    //API Call
-    const response = await fetch(`${host}/accounts/searchAll/${name}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    const json = await response.json()
-    setAccounts(json.accounts)
+  // Search account locally without making API calls
+  const searchAccountAll = (name) => {
+    if (name === '') {
+      console.log('Empty')
+      setAccounts(originalAccounts)
+    } else {
+      // Case-insensitive search
+      const filteredAccounts = originalAccounts.filter((account) =>
+        account.name.toLowerCase().includes(name.toLowerCase()),
+      )
+
+      setAccounts(filteredAccounts)
+    }
+  }
+
+  const searchByAddress = (selectedAddress) => {
+    if (selectedAddress === '') {
+      setAccounts(originalAccounts)
+    } else {
+      // Case-insensitive search
+      const filteredResults = originalAccounts.filter(
+        (account) =>
+          account.address && account.address.toLowerCase() === selectedAddress.toLowerCase(),
+      )
+
+      setAccounts(filteredResults)
+    }
   }
 
   //Get All Accounts
@@ -84,6 +125,7 @@ export const AllStates = (props) => {
       })
       const json = await response.json()
       setAccounts(json)
+      setOriginalAccounts(json)
     } catch (error) {
       //
     }
@@ -185,13 +227,14 @@ export const AllStates = (props) => {
   //Cash Points API
   //Create Cash Point
   const createCashPoint = async (name, balance) => {
+    const adminDetail = getAdminDetail()
     //API Call
     const response = await fetch(`${host}/cashpoints/create`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ name, balance }),
+      body: JSON.stringify({ name, balance, adminDetail }),
     })
     const json = await response.json()
     return json
@@ -271,13 +314,14 @@ export const AllStates = (props) => {
 
   //Create Debit/Credit
   const createDc = async (name, detail, amount, DbCr, selectedDate) => {
+    const adminDetail = getAdminDetail()
     //API Call
     const response = await fetch(`${host}/debitcredit/create`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ name, detail, amount, DbCr, selectedDate }),
+      body: JSON.stringify({ name, detail, amount, DbCr, selectedDate, adminDetail }),
     })
     const json = await response.json()
     return json
@@ -346,6 +390,7 @@ export const AllStates = (props) => {
     description,
     selectedDate,
   ) => {
+    const adminDetail = getAdminDetail()
     //API Call
     const response = await fetch(`${host}/cashdebitcredit/create`, {
       method: 'POST',
@@ -360,6 +405,7 @@ export const AllStates = (props) => {
         customerName,
         description,
         selectedDate,
+        adminDetail,
       }),
     })
     const json = await response.json()
@@ -433,6 +479,7 @@ export const AllStates = (props) => {
     totalPayableAmount,
     weightStatement,
   ) => {
+    const adminDetail = getAdminDetail()
     const response = await fetch(`${host}/invoice/createOnlySeller`, {
       method: 'POST',
       headers: {
@@ -447,6 +494,7 @@ export const AllStates = (props) => {
         calculatedExpenses,
         totalPayableAmount,
         weightStatement,
+        adminDetail,
       }),
     })
     const json = await response.json()
@@ -455,6 +503,7 @@ export const AllStates = (props) => {
 
   //createBuyerSeller create operation
   const createBuyerSeller = async (allInvoices) => {
+    const adminDetail = getAdminDetail()
     const response = await fetch(`${host}/invoice/createBuyerSeller`, {
       method: 'POST',
       headers: {
@@ -462,6 +511,7 @@ export const AllStates = (props) => {
       },
       body: JSON.stringify({
         allInvoices,
+        adminDetail,
       }),
     })
     const json = await response.json()
@@ -470,13 +520,14 @@ export const AllStates = (props) => {
 
   //Create Stock Manual
   const createStockManual = async (crop, inout, quantity, description) => {
+    const adminDetail = getAdminDetail()
     //API Call
     const response = await fetch(`${host}/stock/create`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ crop, inout, quantity, description }),
+      body: JSON.stringify({ crop, inout, quantity, description, adminDetail }),
     })
     const json = await response.json()
     return json
@@ -650,6 +701,56 @@ export const AllStates = (props) => {
     return json
   }
 
+  //get all Admins
+  const getAdmins = async () => {
+    const response = await fetch(`${host}/adminRoles/getAdmins`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    const json = await response.json()
+    return json.admins
+  }
+
+  //Update status of accountant
+  const updateAccountantStatus = async (id, status) => {
+    //API Call
+    const response = await fetch(`${host}/adminRoles/updateAccountantStatus/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ status }),
+    })
+    const json = await response.json()
+    return json
+  }
+
+  //get all Admins
+  const getStatusUpdate = async (email) => {
+    const response = await fetch(`${host}/adminRoles/getStatusUpdate/${email}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    const json = await response.json()
+    return json
+  }
+
+  //Get the guarrenter
+  const getGuarrenty = async (customer) => {
+    const response = await fetch(`${host}/accounts/guarranters/${customer}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    const json = await response.json()
+    return json
+  }
+
   return (
     <>
       <context.Provider
@@ -704,6 +805,12 @@ export const AllStates = (props) => {
           getAccountants,
           updateAccountant,
           deleteAccountant,
+          getAdmins,
+          updateAccountantStatus,
+          getStatusUpdate,
+          getAddresses,
+          searchByAddress,
+          getGuarrenty,
         }}
       >
         {props.children}

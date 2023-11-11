@@ -5,11 +5,77 @@ import { Link, useLocation } from 'react-router-dom'
 import { FaCircle } from 'react-icons/fa'
 import Select from 'react-select' // Import the Select component from react-select
 import '../errorWait.css'
+import Autosuggest from 'react-autosuggest'
+import { useEffect } from 'react'
 
 const CreateAccount = () => {
   const context = useContext(contextCreator)
-  const { searchAccount, createAccount } = context
+  const { searchAccount, createAccount, getAddresses } = context
   const [createDone, setCreateDone] = useState(true)
+
+  const [suggestions, setSuggestions] = useState([])
+  const [addressValue, setAddressValue] = useState('')
+  const [addressSuggestions, setAddressSuggestions] = useState([])
+
+  useEffect(() => {
+    try {
+      async function fetchaddresses() {
+        // setWait('فارمولا لوڈ ہو رہے ہیں')
+        const response = await getAddresses()
+        setAddressSuggestions(response)
+        // Assuming response is a valid object
+        // ...
+        // setWait('')
+      }
+      fetchaddresses()
+    } catch (error) {}
+  }, [])
+
+  const getSuggestions = (value) => {
+    if ((value === '' && addressValue === 'All') || addressValue === '') {
+      setSuggestions(addressSuggestions)
+    } else {
+      const filteredSuggestions = (addressSuggestions || []).filter(
+        (suggestion) =>
+          suggestion.name && suggestion.name.toLowerCase().includes(value.toLowerCase()),
+      )
+      setSuggestions(filteredSuggestions)
+    }
+  }
+
+  const onAddressChange = (event, { newValue }) => {
+    setAddressValue(newValue)
+    setDetail({ ...detail, address: newValue }) // Update detail.address on every change
+  }
+
+  const onAddressSuggestionsFetchRequested = ({ value }) => {
+    getSuggestions(value)
+  }
+
+  const onAddressSuggestionsClearRequested = () => {
+    setSuggestions([])
+  }
+
+  const onAddressSuggestionSelected = (event, { suggestion }) => {
+    setDetail({ ...detail, address: suggestion.name })
+  }
+
+  const renderAddressSuggestion = (suggestion) => (
+    <div style={{ border: '1px solid blue', padding: '5px', margin: '5px', borderRadius: '5px' }}>
+      {suggestion.name}
+    </div>
+  )
+
+  const inputProps = {
+    placeholder: 'مکمل پتہ...',
+    value: addressValue,
+    onChange: onAddressChange,
+    className: 'form-control', // Bootstrap form control class
+    onFocus: () => {
+      setAddressValue('All')
+      getSuggestions('')
+    },
+  }
 
   const mobileNumberRegex = /^03[0-9]{9}$/
   const idCardNumberRegex = /^[0-9]{5}-[0-9]{7}-[0-9]$/
@@ -112,10 +178,12 @@ const CreateAccount = () => {
         setError('براہ کرم درست فارمیٹ کے ساتھ شناختی کارڈ نمبر لکھیں')
       } else {
         setCreateDone(false)
+        let trimmedName = detail.name.trim() // Remove leading and trailing spaces
+        let trimmedAddress = detail.address.trim()
         let response = await createAccount(
-          detail.name,
+          trimmedName,
           detail.mobileNumbers,
-          detail.address,
+          trimmedAddress,
           detail.guarranter,
           detail.idCardNumber,
           detail.status,
@@ -136,6 +204,7 @@ const CreateAccount = () => {
             mobileNumbers: [],
             idCardNumber: '',
           })
+          setAddressValue('')
         }
       }
     } catch (error) {
@@ -321,16 +390,17 @@ const CreateAccount = () => {
                       </div>
                       <div className="col-md-12">
                         <div className="position-relative form-group mt-2">
-                          <input
-                            name="address"
-                            id="address"
-                            placeholder="مکمل پتہ..."
-                            type="text"
-                            className="form-control"
-                            value={detail.address}
-                            onChange={onChange}
-                            autoComplete="off"
-                          />
+                          <div className="position-relative form-group mt-2">
+                            <Autosuggest
+                              suggestions={suggestions}
+                              onSuggestionsFetchRequested={onAddressSuggestionsFetchRequested}
+                              onSuggestionsClearRequested={onAddressSuggestionsClearRequested}
+                              getSuggestionValue={(suggestion) => suggestion.name}
+                              renderSuggestion={renderAddressSuggestion}
+                              onSuggestionSelected={onAddressSuggestionSelected}
+                              inputProps={inputProps}
+                            />
+                          </div>
                         </div>
                       </div>
                       <div className="col-md-12">

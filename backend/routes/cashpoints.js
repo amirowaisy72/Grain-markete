@@ -8,7 +8,7 @@ router.post("/create", async (req, res) => {
   let success = false;
   try {
     //store data
-    const { name, balance } = req.body; // de-Structure
+    const { name, balance, adminDetail } = req.body; // de-Structure
     const dateToUse = Date.now();
     const dup = await CashPoints.findOne({
       name: name,
@@ -18,6 +18,7 @@ router.post("/create", async (req, res) => {
       let cashpoints = await CashPoints.create({
         name: name,
         balance: balance,
+        adminDetail,
       });
 
       //Create Cash Debit/Credit Query
@@ -29,6 +30,7 @@ router.post("/create", async (req, res) => {
         customer: "",
         detail: "Cash Point Initialized",
         date: dateToUse,
+        adminDetail,
       });
       success = true;
       res.send({ success, cashpoints });

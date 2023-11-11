@@ -44,6 +44,9 @@ const StockSchema = new Schema({
   weightStatement: {
     type: String,
   },
+  adminDetail: {
+    type: Object,
+  },
   date: {
     type: Date,
     default: Date.now,

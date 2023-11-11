@@ -84,26 +84,40 @@ const DcBook = ({ data, entriesPerPage }) => {
           <tr key={item._id}>
             <td>
               {item.detail === 'انوائس' ? (
-                <Link
-                  className="btn btn-primary"
-                  to="/printInvoice"
-                  state={{
-                    customer: item.name,
-                    crop: item.crop,
-                    quantity: item.quantity,
-                    rate: item.rate,
-                    totalAmount: item.totalAmount,
-                    calculatedExpenses: item.calculatedExpenses,
-                    totalPayableAmount: item.totalPayableAmount,
-                    weightStatement: item.weightStatement,
-                    source: 'Accounts',
-                  }}
-                >
-                  انوائس
-                </Link>
+                <>
+                  <Link
+                    className="btn btn-primary"
+                    to="/printInvoice"
+                    state={{
+                      customer: item.name,
+                      crop: item.crop,
+                      quantity: item.quantity,
+                      rate: item.rate,
+                      totalAmount: item.totalAmount,
+                      calculatedExpenses: item.calculatedExpenses,
+                      totalPayableAmount: item.totalPayableAmount,
+                      weightStatement: item.weightStatement,
+                      source: 'Accounts',
+                    }}
+                  >
+                    انوائس
+                  </Link>{' '}
+                  {item.otherDetail}
+                </>
               ) : (
                 item.detail
               )}
+              <br></br>
+              <span
+                style={{
+                  fontSize: '10px',
+                  backgroundColor: '#ccc',
+                  padding: '2px 5px',
+                  borderRadius: '5px',
+                }}
+              >
+                Created by {item.adminDetail?.username}
+              </span>
             </td>
             <td>{timeMaker(item.date)}</td>
             <td>{item.DbCr === 'Debit' ? 'نام' : 'جمع'}</td>

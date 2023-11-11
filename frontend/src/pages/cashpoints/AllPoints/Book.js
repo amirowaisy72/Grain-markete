@@ -101,7 +101,20 @@ const Book = ({ data, entriesPerPage }) => {
           <tbody>
             {displayData().map((item) => (
               <tr key={item._id}>
-                <td>{item.name}</td>
+                <td>
+                  {item.name}
+                  <br></br>
+                  <span
+                    style={{
+                      fontSize: '10px',
+                      backgroundColor: '#ccc',
+                      padding: '2px 5px',
+                      borderRadius: '5px',
+                    }}
+                  >
+                    Created by {item.adminDetail?.username}
+                  </span>
+                </td>
                 <td>Rs {moneyFormatter(item.balance)}</td>
                 <td>{timeMaker(item.date)}</td>
                 <td>

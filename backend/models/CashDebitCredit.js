@@ -27,6 +27,9 @@ const CashDcSchema = new Schema({
   detail: {
     type: String,
   },
+  adminDetail:{
+    type: Object,
+  },
   date: {
     type: Date,
   },

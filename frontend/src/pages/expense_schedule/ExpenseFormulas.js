@@ -128,6 +128,8 @@ const ExpenseFormulas = () => {
                     ? 'سوتلی'
                     : expenseCategory === 'Ghisai'
                     ? 'گھسائی'
+                    : expenseCategory === 'Silai'
+                    ? 'سلائی'
                     : ''}
                 </td>
                 {cropNames.map((cropName) => {

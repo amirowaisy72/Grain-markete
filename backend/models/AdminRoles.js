@@ -17,6 +17,9 @@ const adminRolesSchema = new mongoose.Schema({
   allowedByAdmin: {
     type: Boolean,
   },
+  active: {
+    type: Boolean,
+  },
   date: {
     type: Date,
     default: Date.now,

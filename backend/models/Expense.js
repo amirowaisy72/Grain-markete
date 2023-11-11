@@ -102,8 +102,8 @@ const expenseSchema = new mongoose.Schema({
       },
       Others: {
         Formula: {
-          CompleteBagMember: Number,
-          CompleteBagNonMember: Number,
+          CompleteBag: Number,
+          IncompleteBag: Number,
         },
         Info: String,
       },
@@ -221,6 +221,29 @@ const expenseSchema = new mongoose.Schema({
         Info: String,
       },
       Others: {
+        Formula: String, // Modify the data type as needed
+        Info: String,
+      },
+    },
+  },
+  Silai: {
+    Seller: Boolean,
+    Buyer: {
+      Gandum: {
+        Formula: {
+          CompleteBag: Number,
+          IncompleteBag: Number,
+        },
+        Info: String,
+      },
+      Others: {
+        Formula: {
+          CompleteBag: Number,
+          IncompleteBag: Number,
+        },
+        Info: String,
+      },
+      Kapaas: {
         Formula: String, // Modify the data type as needed
         Info: String,
       },

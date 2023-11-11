@@ -14,6 +14,9 @@ const CashPointsSchema = new Schema({
   balance: {
     type: Number,
   },
+  adminDetail:{
+    type: Object,
+  },
   date: {
     type: Date,
     default: Date.now,

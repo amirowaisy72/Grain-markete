@@ -42,6 +42,12 @@ const DcSchema = new Schema({
   weightStatement: {
     type: String,
   },
+  adminDetail: {
+    type: Object,
+  },
+  otherDetail: {
+    type: String,
+  },
   date: {
     type: Date,
   },

@@ -136,6 +136,7 @@ router.post("/createAdmin", async (req, res) => {
 
     if (role === "Accountant") {
       newAdminData.allowedByAdmin = false;
+      newAdminData.active = false;
     }
 
     // Create a new admin
@@ -288,6 +289,43 @@ router.put("/updateAccountant/:id", async (req, res) => {
   }
 });
 
+router.put("/updateAccountantStatus/:id", async (req, res) => {
+  try {
+    let success = false;
+    const id = req.params.id;
+    const status = req.body.status;
+
+    // Calculate the new value for the active field based on the status
+    const newActiveValue = !status; // This will toggle the value
+
+    // Find the AdminRoles record by its id and update allowedByAdmin to true
+    const updatedAdminRoles = await AdminRoles.findByIdAndUpdate(
+      id,
+      { active: newActiveValue },
+      { new: true }
+    );
+
+    if (!updatedAdminRoles) {
+      // If no record was found with the given id, return a 404 Not Found response
+      return res.status(404).json({
+        success: false,
+        error: "AdminRoles not found",
+      });
+    }
+
+    // If the update was successful, return the updated record
+    res.status(200).json({
+      success: true,
+      data: updatedAdminRoles,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
 router.delete("/deleteAccountant/:id", async (req, res) => {
   try {
     const id = req.params.id;
@@ -309,6 +347,27 @@ router.delete("/deleteAccountant/:id", async (req, res) => {
     return res
       .status(500)
       .json({ success: false, message: "Internal server error" });
+  }
+});
+
+router.get("/getAdmins", async (req, res) => {
+  try {
+    const admins = await AdminRoles.find({ role: "Accountant" });
+    res.json({ admins });
+  } catch (error) {
+    // Handle the error appropriately (e.g., return an error response)
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get("/getStatusUpdate/:email", async (req, res) => {
+  try {
+    const email = req.params.email;
+    const accountant = await AdminRoles.findOne({ email: email });
+    res.json({ active: accountant.active });
+  } catch (error) {
+    // Handle the error appropriately (e.g., return an error response)
+    res.status(500).json({ error: error.message });
   }
 });
 
